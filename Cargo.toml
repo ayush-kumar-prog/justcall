@@ -7,3 +7,4 @@ edition = "2024"
 # Only essential deps - we avoid complex dependency trees
 rand = "0.8"         # Cryptographically secure random for code generation
 data-encoding = "2.5" # Base32 encoding (simple, well-tested lib)
+sha2 = "0.10"         # SHA256 hashing for room ID derivation

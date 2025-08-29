@@ -5,7 +5,9 @@
 /// Change notes: If adding new submodules, update parent mod.rs files
 
 pub mod crypto;
+pub mod room;
 
 // Re-export main functions for cleaner imports
-// Usage: use justcall::core::generate_code_base32_100b;
+// Usage: use justcall::core::{generate_code_base32_100b, room_id_from_code};
 pub use crypto::generate_code_base32_100b;
+pub use room::room_id_from_code;

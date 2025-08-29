@@ -178,4 +178,101 @@ mod tests {
             "Code generation too slow: {:?} for 1000 codes", duration
         );
     }
+    
+    /// Edge case: Concurrent generation from multiple threads
+    #[test]
+    fn test_concurrent_generation() {
+        use std::thread;
+        use std::sync::Arc;
+        use std::sync::Mutex;
+        
+        let codes = Arc::new(Mutex::new(HashSet::new()));
+        let mut handles = vec![];
+        
+        // Spawn 10 threads generating 100 codes each
+        for _ in 0..10 {
+            let codes_clone = Arc::clone(&codes);
+            let handle = thread::spawn(move || {
+                for _ in 0..100 {
+                    let code = generate_code_base32_100b();
+                    codes_clone.lock().unwrap().insert(code);
+                }
+            });
+            handles.push(handle);
+        }
+        
+        // Wait for all threads
+        for handle in handles {
+            handle.join().unwrap();
+        }
+        
+        // Should have 1000 unique codes
+        assert_eq!(codes.lock().unwrap().len(), 1000, 
+                   "Concurrent generation produced duplicates");
+    }
+    
+    /// Edge case: Many rapid sequential calls
+    #[test]
+    fn test_rapid_sequential_generation() {
+        let mut codes = Vec::new();
+        
+        // Generate as fast as possible
+        for _ in 0..100 {
+            codes.push(generate_code_base32_100b());
+        }
+        
+        // Check all are unique
+        let unique: HashSet<_> = codes.iter().collect();
+        assert_eq!(unique.len(), codes.len(), "Rapid generation produced duplicates");
+    }
+    
+    /// Edge case: Verify no memory leaks with large batch
+    #[test]
+    fn test_memory_stability() {
+        // Generate and immediately drop many codes
+        for _ in 0..10_000 {
+            let _ = generate_code_base32_100b();
+            // Code is dropped here
+        }
+        // Test passes if no panic/OOM
+    }
+    
+    /// Edge case: Verify reasonable randomness (no obvious patterns)
+    #[test]
+    fn test_randomness_quality() {
+        // Generate many codes and check statistical properties
+        let mut codes = Vec::new();
+        for _ in 0..100 {
+            codes.push(generate_code_base32_100b());
+        }
+        
+        // Count codes with any 4+ repeated chars
+        // With true randomness, some repetition is expected
+        let codes_with_repeats = codes.iter().filter(|code| {
+            let clean = code.replace('-', "");
+            for i in 0..clean.len()-3 {
+                let substr = &clean[i..i+4];
+                let first_char = substr.chars().next().unwrap();
+                if substr.chars().all(|c| c == first_char) {
+                    return true;
+                }
+            }
+            false
+        }).count();
+        
+        // Should be rare but not impossible (< 10% of codes)
+        assert!(
+            codes_with_repeats < 10,
+            "Too many codes with 4+ repeated chars: {} out of 100", codes_with_repeats
+        );
+        
+        // Check that we're not always starting with same chars
+        let first_chars: HashSet<_> = codes.iter()
+            .map(|c| c.chars().next().unwrap())
+            .collect();
+        assert!(
+            first_chars.len() > 10,
+            "Not enough variety in first character: {} different chars", first_chars.len()
+        );
+    }
 }

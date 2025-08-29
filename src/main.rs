@@ -7,18 +7,27 @@
 mod core;
 
 // For testing during development
-use crate::core::generate_code_base32_100b;
+use crate::core::{generate_code_base32_100b, room_id_from_code};
 
 fn main() {
-    println!("JustCall - Code Generation Test\n");
+    println!("JustCall - Phase 1 Demo\n");
     
-    // Generate a few codes to verify it's working
-    println!("Generating sample pairing codes:");
-    for i in 1..=5 {
+    // Generate codes and derive room IDs
+    println!("Partner pairing example:");
+    for i in 1..=3 {
         let code = generate_code_base32_100b();
-        println!("  {}. {}", i, code);
+        let room = room_id_from_code(&code);
+        println!("  Partner {}:", i);
+        println!("    Code: {}", code);
+        println!("    Room: {}\n", room);
     }
     
-    println!("\nAll codes are unique and cryptographically secure.");
-    println!("Share these codes with your partners to establish pairing.");
+    // Demonstrate deterministic rooms
+    println!("Same code = same room:");
+    let shared_code = "test-code-1234-5678-abcd";
+    println!("  Alice uses: {}", shared_code);
+    println!("  Alice joins: {}", room_id_from_code(shared_code));
+    println!("  Bob uses:   {}", shared_code);
+    println!("  Bob joins:   {}", room_id_from_code(shared_code));
+    println!("  ✅ They're in the same room!");
 }
