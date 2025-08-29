@@ -40,6 +40,21 @@
 - ✅ Optional fields (notes, custom hotkeys)
 - ✅ Settings equality comparison
 
+## Phase 2.2: Settings Store (settings_store.rs)
+- ✅ Missing file creates defaults
+- ✅ Save and reload preserves data
+- ✅ First target becomes primary automatically
+- ✅ Removing primary reassigns to next target
+- ✅ Update existing target
+- ✅ Empty file path handling
+- ✅ Corrupt JSON error recovery
+- ✅ Invalid directory paths
+- ✅ Concurrent file access (10 threads)
+- ✅ Unicode in file paths (Chinese/emoji)
+- ✅ Very large settings (1000 targets with 1KB notes each)
+- ✅ Atomic save (temp file cleanup)
+- ✅ Backwards compatibility (missing fields use defaults)
+
 ## Test Commands
 ```bash
 # Run all tests
@@ -53,4 +68,5 @@ cargo test core::crypto
 cargo test core::room
 cargo test core::platform
 cargo test models::settings
+cargo test storage::settings_store
 ```

@@ -6,6 +6,7 @@
 // Declare our modules
 mod core;
 mod models;
+mod storage;
 
 // For testing during development
 use crate::core::{generate_code_base32_100b, room_id_from_code, get_default_keybinds, get_platform_name, get_platform_capabilities};
@@ -65,5 +66,21 @@ fn main() {
             println!("  ... (truncated)");
         }
         Err(e) => println!("  Error serializing: {}", e),
+    }
+    
+    // Demo settings persistence
+    println!("\nSettings Store Demo:");
+    match crate::storage::SettingsStore::load() {
+        Ok(store) => {
+            println!("  ✅ Settings loaded from: ~/Library/Application Support/justcall/");
+            println!("  Current targets: {}", store.get_targets().len());
+            if let Some(primary) = store.get_primary_target() {
+                println!("  Primary target: {}", primary.label);
+            }
+        }
+        Err(e) => {
+            println!("  ℹ️  No settings found (first run): {}", e);
+            println!("  Settings will be created on first save.");
+        }
     }
 }

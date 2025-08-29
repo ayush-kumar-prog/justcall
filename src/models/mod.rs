@@ -7,4 +7,4 @@
 pub mod settings;
 
 // Re-export main types for convenience
-pub use settings::{Settings, Target, TargetType, Keybinds, AppSettings, CallDefaults};
+pub use settings::{Settings, Target, TargetType, CallDefaults};

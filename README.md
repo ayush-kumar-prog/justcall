@@ -12,10 +12,11 @@ cargo run
 cargo test
 
 # Run specific module tests
-cargo test core::crypto      # Phase 1.1: Code generation ✅
-cargo test core::room        # Phase 1.2: Room derivation ✅
-cargo test core::platform    # Phase 1.3: Platform detection ✅
-cargo test models::settings  # Phase 2.1: Settings schema ✅
+cargo test core::crypto           # Phase 1.1: Code generation ✅
+cargo test core::room             # Phase 1.2: Room derivation ✅
+cargo test core::platform         # Phase 1.3: Platform detection ✅
+cargo test models::settings       # Phase 2.1: Settings schema ✅
+cargo test storage::settings_store # Phase 2.2: Settings persistence ✅
 ```
 
 ## Project Structure
@@ -29,6 +30,7 @@ src/
 ├── models/         # Data structures
 │   └── settings.rs # Settings schema ✅
 ├── storage/        # Settings persistence
+│   └── settings_store.rs # Load/save settings ✅
 └── main.rs         # Entry point
 ```
 
