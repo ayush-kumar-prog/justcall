@@ -1,0 +1,429 @@
+// Settings page JavaScript
+// What: Handles all settings UI interactions and Tauri communication
+// Why: Provides user interface for managing targets, hotkeys, and preferences
+// Used by: settings.html
+// Calls: Tauri invoke commands for settings management
+
+class SettingsManager {
+    constructor() {
+        this.hasChanges = false;
+        this.settings = null;
+        this.editingTargetId = null;
+        
+        this.init();
+    }
+    
+    async init() {
+        // Initialize Tauri API if available
+        if (window.__TAURI__) {
+            await this.loadSettings();
+        } else {
+            // Development mode - use mock data
+            console.warn('Tauri API not available, using mock data');
+            this.settings = this.getMockSettings();
+            this.render();
+        }
+        
+        this.setupEventListeners();
+    }
+    
+    // Load settings from Tauri backend
+    async loadSettings() {
+        try {
+            this.settings = await window.__TAURI__.invoke('get_settings');
+            this.render();
+        } catch (error) {
+            console.error('Failed to load settings:', error);
+            this.showError('Failed to load settings');
+        }
+    }
+    
+    // Save settings to Tauri backend
+    async saveSettings() {
+        if (!this.hasChanges) return;
+        
+        try {
+            await window.__TAURI__.invoke('save_settings', { settings: this.settings });
+            this.hasChanges = false;
+            this.showSuccess('Settings saved successfully');
+            
+            // Close window after short delay
+            setTimeout(() => {
+                this.closeWindow();
+            }, 500);
+        } catch (error) {
+            console.error('Failed to save settings:', error);
+            this.showError('Failed to save settings');
+        }
+    }
+    
+    // Setup all event listeners
+    setupEventListeners() {
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
+        });
+        
+        // Buttons
+        document.getElementById('close-btn').addEventListener('click', () => this.closeWindow());
+        document.getElementById('save-btn').addEventListener('click', () => this.saveSettings());
+        document.getElementById('cancel-btn').addEventListener('click', () => this.closeWindow());
+        document.getElementById('add-target-btn').addEventListener('click', () => this.showAddTargetModal());
+        
+        // Modal buttons
+        document.getElementById('modal-save-btn').addEventListener('click', () => this.saveTarget());
+        document.getElementById('modal-cancel-btn').addEventListener('click', () => this.hideModal());
+        document.getElementById('copy-code-btn').addEventListener('click', () => this.copyCode());
+        
+        // Preferences
+        document.getElementById('autostart').addEventListener('change', (e) => {
+            this.settings.app_settings.autostart = e.target.checked;
+            this.hasChanges = true;
+        });
+        
+        document.getElementById('always-on-top').addEventListener('change', (e) => {
+            this.settings.app_settings.always_on_top = e.target.checked;
+            this.hasChanges = true;
+        });
+        
+        document.getElementById('play-join-sound').addEventListener('change', (e) => {
+            this.settings.app_settings.play_join_sound = e.target.checked;
+            this.hasChanges = true;
+        });
+        
+        document.getElementById('show-notifications').addEventListener('change', (e) => {
+            this.settings.app_settings.show_notifications = e.target.checked;
+            this.hasChanges = true;
+        });
+        
+        document.getElementById('theme').addEventListener('change', (e) => {
+            this.settings.app_settings.theme = e.target.value;
+            this.hasChanges = true;
+        });
+        
+        // Hotkey inputs
+        document.getElementById('join-primary').addEventListener('click', (e) => {
+            this.recordHotkey(e.target, 'join_primary');
+        });
+        
+        document.getElementById('hangup').addEventListener('click', (e) => {
+            this.recordHotkey(e.target, 'hangup');
+        });
+        
+        // Modal close on background click
+        document.getElementById('target-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'target-modal') {
+                this.hideModal();
+            }
+        });
+    }
+    
+    // Switch between tabs
+    switchTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.tab === tabName);
+        });
+        
+        // Update tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.toggle('active', content.id === `${tabName}-tab`);
+        });
+    }
+    
+    // Render all settings
+    render() {
+        if (!this.settings) return;
+        
+        this.renderTargets();
+        this.renderHotkeys();
+        this.renderPreferences();
+    }
+    
+    // Render targets list
+    renderTargets() {
+        const container = document.getElementById('targets-list');
+        
+        if (this.settings.targets.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <p>No targets configured yet.</p>
+                    <p>Click "Add Target" to set up your first call partner or group.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = this.settings.targets.map(target => `
+            <div class="target-item" data-id="${target.id}">
+                <div class="target-info">
+                    <div class="target-label">${this.escapeHtml(target.label)}</div>
+                    <div class="target-code">${target.code}</div>
+                    <div class="target-badges">
+                        ${target.is_primary ? '<span class="badge primary">Primary</span>' : ''}
+                        <span class="badge">${target.target_type}</span>
+                    </div>
+                </div>
+                <div class="target-actions">
+                    <button class="btn btn-small btn-secondary" onclick="settingsManager.editTarget('${target.id}')">Edit</button>
+                    <button class="btn btn-small btn-secondary" onclick="settingsManager.removeTarget('${target.id}')">Remove</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Render hotkeys
+    renderHotkeys() {
+        document.getElementById('join-primary').value = this.settings.keybinds.join_primary;
+        document.getElementById('hangup').value = this.settings.keybinds.hangup;
+    }
+    
+    // Render preferences
+    renderPreferences() {
+        document.getElementById('autostart').checked = this.settings.app_settings.autostart;
+        document.getElementById('always-on-top').checked = this.settings.app_settings.always_on_top;
+        document.getElementById('play-join-sound').checked = this.settings.app_settings.play_join_sound;
+        document.getElementById('show-notifications').checked = this.settings.app_settings.show_notifications;
+        document.getElementById('theme').value = this.settings.app_settings.theme;
+    }
+    
+    // Show add target modal
+    async showAddTargetModal() {
+        this.editingTargetId = null;
+        document.getElementById('modal-title').textContent = 'Add Target';
+        
+        // Reset form
+        document.getElementById('target-label').value = '';
+        document.getElementById('target-notes').value = '';
+        document.querySelector('input[name="target-type"][value="person"]').checked = true;
+        document.getElementById('target-primary').checked = this.settings.targets.length === 0;
+        document.getElementById('start-audio-muted').checked = false;
+        document.getElementById('start-video-muted').checked = false;
+        
+        // Generate new code
+        const code = await this.generateCode();
+        document.getElementById('target-code').value = code;
+        
+        this.showModal();
+    }
+    
+    // Edit existing target
+    editTarget(targetId) {
+        const target = this.settings.targets.find(t => t.id === targetId);
+        if (!target) return;
+        
+        this.editingTargetId = targetId;
+        document.getElementById('modal-title').textContent = 'Edit Target';
+        
+        // Fill form with target data
+        document.getElementById('target-label').value = target.label;
+        document.getElementById('target-code').value = target.code;
+        document.getElementById('target-notes').value = target.notes || '';
+        document.querySelector(`input[name="target-type"][value="${target.target_type}"]`).checked = true;
+        document.getElementById('target-primary').checked = target.is_primary;
+        document.getElementById('start-audio-muted').checked = target.call_defaults.start_audio_muted;
+        document.getElementById('start-video-muted').checked = target.call_defaults.start_video_muted;
+        
+        this.showModal();
+    }
+    
+    // Save target (add or edit)
+    async saveTarget() {
+        const label = document.getElementById('target-label').value.trim();
+        if (!label) {
+            this.showError('Please enter a label for the target');
+            return;
+        }
+        
+        const targetData = {
+            label,
+            code: document.getElementById('target-code').value,
+            target_type: document.querySelector('input[name="target-type"]:checked').value,
+            is_primary: document.getElementById('target-primary').checked,
+            call_defaults: {
+                start_audio_muted: document.getElementById('start-audio-muted').checked,
+                start_video_muted: document.getElementById('start-video-muted').checked,
+                e2ee_enabled: false
+            },
+            notes: document.getElementById('target-notes').value.trim() || null
+        };
+        
+        if (this.editingTargetId) {
+            // Update existing target
+            const index = this.settings.targets.findIndex(t => t.id === this.editingTargetId);
+            if (index !== -1) {
+                this.settings.targets[index] = {
+                    ...this.settings.targets[index],
+                    ...targetData
+                };
+            }
+        } else {
+            // Add new target
+            const newTarget = {
+                id: this.generateId(),
+                created_at: new Date().toISOString(),
+                ...targetData
+            };
+            
+            // If setting as primary, unset other primaries
+            if (newTarget.is_primary) {
+                this.settings.targets.forEach(t => t.is_primary = false);
+            }
+            
+            this.settings.targets.push(newTarget);
+        }
+        
+        this.hasChanges = true;
+        this.hideModal();
+        this.renderTargets();
+    }
+    
+    // Remove target
+    removeTarget(targetId) {
+        if (!confirm('Are you sure you want to remove this target?')) return;
+        
+        this.settings.targets = this.settings.targets.filter(t => t.id !== targetId);
+        
+        // If removed primary, make first target primary
+        if (this.settings.targets.length > 0 && !this.settings.targets.some(t => t.is_primary)) {
+            this.settings.targets[0].is_primary = true;
+        }
+        
+        this.hasChanges = true;
+        this.renderTargets();
+    }
+    
+    // Record hotkey
+    recordHotkey(input, keybind) {
+        input.classList.add('recording');
+        input.value = 'Press keys...';
+        
+        const handler = (e) => {
+            e.preventDefault();
+            
+            const modifiers = [];
+            if (e.metaKey) modifiers.push('Cmd');
+            if (e.ctrlKey && !e.metaKey) modifiers.push('Ctrl');
+            if (e.altKey) modifiers.push('Alt');
+            if (e.shiftKey) modifiers.push('Shift');
+            
+            if (e.key && !['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) {
+                const key = e.key.length === 1 ? e.key.toUpperCase() : e.key;
+                const hotkey = [...modifiers, key].join('+');
+                
+                input.value = hotkey;
+                this.settings.keybinds[keybind] = hotkey;
+                this.hasChanges = true;
+                
+                input.classList.remove('recording');
+                document.removeEventListener('keydown', handler);
+            }
+        };
+        
+        document.addEventListener('keydown', handler);
+        
+        // Cancel on click outside
+        setTimeout(() => {
+            document.addEventListener('click', () => {
+                input.classList.remove('recording');
+                input.value = this.settings.keybinds[keybind];
+                document.removeEventListener('keydown', handler);
+            }, { once: true });
+        }, 100);
+    }
+    
+    // Generate code
+    async generateCode() {
+        if (window.__TAURI__) {
+            try {
+                return await window.__TAURI__.invoke('generate_code');
+            } catch (error) {
+                console.error('Failed to generate code:', error);
+            }
+        }
+        
+        // Fallback for development
+        return 'test-code-' + Math.random().toString(36).substr(2, 9);
+    }
+    
+    // Copy code to clipboard
+    async copyCode() {
+        const code = document.getElementById('target-code').value;
+        
+        try {
+            await navigator.clipboard.writeText(code);
+            this.showSuccess('Code copied to clipboard');
+        } catch (error) {
+            console.error('Failed to copy:', error);
+            this.showError('Failed to copy code');
+        }
+    }
+    
+    // UI helpers
+    showModal() {
+        document.getElementById('target-modal').classList.add('active');
+    }
+    
+    hideModal() {
+        document.getElementById('target-modal').classList.remove('active');
+    }
+    
+    showSuccess(message) {
+        // TODO: Implement toast notifications
+        console.log('Success:', message);
+    }
+    
+    showError(message) {
+        // TODO: Implement toast notifications
+        console.error('Error:', message);
+        alert(message);
+    }
+    
+    closeWindow() {
+        if (this.hasChanges) {
+            if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
+                return;
+            }
+        }
+        
+        if (window.__TAURI__) {
+            window.__TAURI__.window.getCurrent().close();
+        } else {
+            window.close();
+        }
+    }
+    
+    // Utility functions
+    generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+    
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Mock data for development
+    getMockSettings() {
+        return {
+            version: 1,
+            app_settings: {
+                autostart: false,
+                always_on_top: true,
+                play_join_sound: true,
+                show_notifications: true,
+                theme: 'system'
+            },
+            keybinds: {
+                join_primary: 'Cmd+Opt+J',
+                hangup: 'Cmd+Opt+H',
+                join_target_prefix: 'Cmd+Opt+'
+            },
+            targets: []
+        };
+    }
+}
+
+// Initialize settings manager
+const settingsManager = new SettingsManager();
