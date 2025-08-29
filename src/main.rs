@@ -7,27 +7,36 @@
 mod core;
 
 // For testing during development
-use crate::core::{generate_code_base32_100b, room_id_from_code};
+use crate::core::{generate_code_base32_100b, room_id_from_code, get_default_keybinds, get_platform_name, get_platform_capabilities};
 
 fn main() {
     println!("JustCall - Phase 1 Demo\n");
     
-    // Generate codes and derive room IDs
-    println!("Partner pairing example:");
-    for i in 1..=3 {
-        let code = generate_code_base32_100b();
-        let room = room_id_from_code(&code);
-        println!("  Partner {}:", i);
-        println!("    Code: {}", code);
-        println!("    Room: {}\n", room);
-    }
+    // Show platform info
+    println!("Platform Detection:");
+    println!("  Running on: {}", get_platform_name());
+    let keybinds = get_default_keybinds();
+    println!("  Default hotkeys:");
+    println!("    Join: {}", keybinds.join_primary);
+    println!("    Hangup: {}", keybinds.hangup);
+    println!("    Target prefix: {}[1-9]\n", keybinds.join_target_prefix);
     
-    // Demonstrate deterministic rooms
-    println!("Same code = same room:");
-    let shared_code = "test-code-1234-5678-abcd";
-    println!("  Alice uses: {}", shared_code);
-    println!("  Alice joins: {}", room_id_from_code(shared_code));
-    println!("  Bob uses:   {}", shared_code);
-    println!("  Bob joins:   {}", room_id_from_code(shared_code));
-    println!("  ✅ They're in the same room!");
+    // Show capabilities
+    let caps = get_platform_capabilities();
+    println!("  Platform capabilities:");
+    println!("    System tray: {}", if caps.has_native_tray { "✅" } else { "❌" });
+    println!("    Always on top: {}", if caps.supports_always_on_top { "✅" } else { "❌" });
+    println!("    Global shortcuts: {}", if caps.supports_global_shortcuts { "✅" } else { "❌" });
+    if caps.needs_accessibility_permission {
+        println!("    ⚠️  Requires accessibility permission for global shortcuts");
+    }
+    println!();
+    
+    // Generate a pairing code and room
+    println!("Example pairing:");
+    let code = generate_code_base32_100b();
+    let room = room_id_from_code(&code);
+    println!("  Your code: {}", code);
+    println!("  Your room: {}", room);
+    println!("  Share the code with your partner to connect!");
 }

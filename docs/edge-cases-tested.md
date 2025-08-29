@@ -18,6 +18,16 @@
 - ✅ Similar inputs produce different outputs
 - ✅ Performance under 1ms per derivation
 
+## Phase 1.3: Platform Detection (platform.rs)
+- ✅ Consistent values across multiple calls
+- ✅ Correct modifier key ordering (Cmd before Opt, Ctrl before Alt)
+- ✅ No conflicts with common shortcuts (Ctrl+C, Cmd+S, etc)
+- ✅ Unique keybinds (join ≠ hangup ≠ targets)
+- ✅ Target prefix formatting (ends with + for appending numbers)
+- ✅ Concurrent access thread safety
+- ✅ Platform-specific behavior (Cmd on macOS, Ctrl elsewhere)
+- ✅ Capability detection (permissions, features)
+
 ## Test Commands
 ```bash
 # Run all tests
@@ -29,4 +39,5 @@ cargo test -- --nocapture
 # Run specific module
 cargo test core::crypto
 cargo test core::room
+cargo test core::platform
 ```

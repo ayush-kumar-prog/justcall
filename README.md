@@ -14,7 +14,7 @@ cargo test
 # Run specific module tests
 cargo test core::crypto   # Phase 1.1: Code generation ✅
 cargo test core::room     # Phase 1.2: Room derivation ✅
-cargo test core::platform # Phase 1.3: Platform detection
+cargo test core::platform # Phase 1.3: Platform detection ✅
 ```
 
 ## Project Structure
