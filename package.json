@@ -1,0 +1,32 @@
+{
+  "name": "justcall",
+  "version": "1.0.0",
+  "description": "Zero-friction video calling. Press a hotkey → instantly in a call.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "http-server dist -p 1420 -c-1",
+    "build": "echo 'Frontend build'",
+    "tauri": "tauri"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayush-kumar-prog/justcall.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ayush-kumar-prog/justcall/issues"
+  },
+  "homepage": "https://github.com/ayush-kumar-prog/justcall#readme",
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.8.3",
+    "http-server": "^14.1.1"
+  }
+}
