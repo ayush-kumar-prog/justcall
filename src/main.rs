@@ -83,4 +83,28 @@ fn main() {
             println!("  Settings will be created on first save.");
         }
     }
+    
+    // Demo state machine
+    println!("\nCall State Machine Demo:");
+    use crate::core::CallState;
+    let mut state = CallState::default();
+    println!("  Initial state: {} (busy: {})", state, state.is_busy());
+    
+    // Show valid transitions
+    println!("  Valid transitions from {}:", state);
+    for next in [CallState::Idle, CallState::Connecting, CallState::InCall, CallState::Disconnecting] {
+        if state.can_transition_to(next) {
+            println!("    → {}", next);
+        }
+    }
+    
+    // Demo a call flow
+    println!("\n  Simulating call flow:");
+    println!("    {} → Connecting", state);
+    state = CallState::Connecting;
+    println!("    {} → InCall", state);
+    state = CallState::InCall;
+    println!("    {} → Disconnecting", state);
+    state = CallState::Disconnecting;
+    println!("    {} → Idle", state);
 }

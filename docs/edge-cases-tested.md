@@ -55,6 +55,20 @@
 - ✅ Atomic save (temp file cleanup)
 - ✅ Backwards compatibility (missing fields use defaults)
 
+## Phase 2.3: Call State Machine (call_state.rs)
+- ✅ Valid state transitions enforced
+- ✅ Invalid transitions rejected
+- ✅ Complete call flow (Idle → Connecting → InCall → Disconnecting → Idle)
+- ✅ Cancel flow (Connecting → Disconnecting → Idle)
+- ✅ is_busy() helper method
+- ✅ Human-readable descriptions
+- ✅ No self-transitions allowed
+- ✅ Thread safety (Copy trait)
+- ✅ Exhaustive state coverage
+- ✅ No backwards transitions (except Disconnecting → Idle)
+- ✅ Equality and Debug traits
+- ✅ Default state is Idle
+
 ## Test Commands
 ```bash
 # Run all tests
@@ -69,4 +83,5 @@ cargo test core::room
 cargo test core::platform
 cargo test models::settings
 cargo test storage::settings_store
+cargo test core::call_state
 ```
