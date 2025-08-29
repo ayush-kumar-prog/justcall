@@ -9,8 +9,6 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_log::Builder::new().build())
         .setup(|app| {
-            println!("Setting up JustCall app...");
-            
             // Create menu items
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let settings_i = MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
@@ -26,11 +24,11 @@ pub fn run() {
                 .menu_on_left_click(false) // Right-click only for menu
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "quit" => {
-                        println!("quit menu item was clicked");
+                        log::info!("User selected quit from tray menu");
                         app.exit(0);
                     }
                     "settings" => {
-                        println!("settings menu item was clicked");
+                        log::info!("User selected settings from tray menu");
                         // Show settings window
                         if let Some(window) = app.get_webview_window("main") {
                             let _ = window.show();
@@ -38,38 +36,39 @@ pub fn run() {
                         }
                     }
                     _ => {
-                        println!("menu item {:?} not handled", event.id);
+                        log::warn!("Unknown menu item: {:?}", event.id);
                     }
                 })
-                .on_tray_icon_event(|tray, event| match event {
-                    TrayIconEvent::Click {
-                        button: MouseButton::Left,
-                        button_state: MouseButtonState::Up,
-                        ..
-                    } => {
-                        println!("left click pressed and released");
-                        // For now, just log it
-                    }
-                    TrayIconEvent::Click {
-                        button: MouseButton::Right,
-                        ..
-                    } => {
-                        println!("right click detected");
-                    }
-                    _ => {
-                        println!("unhandled tray event: {:?}", event);
+                .on_tray_icon_event(|tray, event| {
+                    // Only log significant events, not every mouse movement
+                    match event {
+                        TrayIconEvent::Click {
+                            button: MouseButton::Left,
+                            button_state: MouseButtonState::Up,
+                            ..
+                        } => {
+                            log::debug!("Tray icon left-clicked");
+                        }
+                        TrayIconEvent::DoubleClick { .. } => {
+                            log::debug!("Tray icon double-clicked");
+                        }
+                        // Ignore Move, Enter, Leave events to reduce noise
+                        TrayIconEvent::Move { .. } |
+                        TrayIconEvent::Enter { .. } |
+                        TrayIconEvent::Leave { .. } => {}
+                        _ => {
+                            log::debug!("Tray event: {:?}", event);
+                        }
                     }
                 })
                 .build(app)?;
             
-            println!("Tray icon created with menu!");
-            
             // Hide main window on startup
             if let Some(window) = app.get_webview_window("main") {
                 window.hide()?;
-                println!("Main window hidden");
             }
             
+            log::info!("JustCall initialized successfully");
             Ok(())
         })
         .run(tauri::generate_context!())
