@@ -1,0 +1,9 @@
+[package]
+name = "justcall"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# Only essential deps - we avoid complex dependency trees
+rand = "0.8"         # Cryptographically secure random for code generation
+data-encoding = "2.5" # Base32 encoding (simple, well-tested lib)
