@@ -28,6 +28,18 @@
 - ✅ Platform-specific behavior (Cmd on macOS, Ctrl elsewhere)
 - ✅ Capability detection (permissions, features)
 
+## Phase 2.1: Settings Schema (settings.rs)
+- ✅ Default values and initialization
+- ✅ JSON serialization/deserialization
+- ✅ Backwards compatibility (missing fields)
+- ✅ Empty strings in all fields
+- ✅ Unicode characters in labels and notes
+- ✅ Large settings (100 targets)
+- ✅ Duplicate target IDs (allowed, validation elsewhere)
+- ✅ Malformed JSON error handling
+- ✅ Optional fields (notes, custom hotkeys)
+- ✅ Settings equality comparison
+
 ## Test Commands
 ```bash
 # Run all tests
@@ -40,4 +52,5 @@ cargo test -- --nocapture
 cargo test core::crypto
 cargo test core::room
 cargo test core::platform
+cargo test models::settings
 ```

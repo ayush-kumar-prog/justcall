@@ -4,3 +4,4 @@
 /// Used by: examples/*, integration tests, future Tauri commands
 
 pub mod core;
+pub mod models;

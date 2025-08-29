@@ -5,6 +5,7 @@
 
 // Declare our modules
 mod core;
+mod models;
 
 // For testing during development
 use crate::core::{generate_code_base32_100b, room_id_from_code, get_default_keybinds, get_platform_name, get_platform_capabilities};
@@ -39,4 +40,30 @@ fn main() {
     println!("  Your code: {}", code);
     println!("  Your room: {}", room);
     println!("  Share the code with your partner to connect!");
+    
+    // Demo settings serialization
+    println!("\nSettings Schema Demo:");
+    let mut settings = crate::models::Settings::default();
+    
+    // Add a sample target
+    settings.targets.push(crate::models::Target {
+        id: "tg_demo".to_string(),
+        label: "Demo Partner".to_string(),
+        code,
+        target_type: crate::models::TargetType::Person,
+        is_primary: true,
+        call_defaults: crate::models::CallDefaults::default(),
+        created_at: "2024-01-01T00:00:00Z".to_string(),
+        notes: None,
+    });
+    
+    // Show JSON format
+    match serde_json::to_string_pretty(&settings) {
+        Ok(json) => {
+            println!("  Settings would be saved as:");
+            println!("  {}", json.lines().take(10).collect::<Vec<_>>().join("\n  "));
+            println!("  ... (truncated)");
+        }
+        Err(e) => println!("  Error serializing: {}", e),
+    }
 }
