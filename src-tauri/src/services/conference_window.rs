@@ -83,6 +83,16 @@ impl ConferenceWindow {
         .skip_taskbar(false)  // Show in taskbar/dock
         .decorations(true)    // Native window chrome
         .visible(false)       // Start hidden, show after load
+        .initialization_script(
+            r#"
+            console.log('Conference window initialization script running...');
+            // Ensure Tauri API is available
+            if (!window.__TAURI__ && window.__TAURI_INTERNALS__) {
+                window.__TAURI__ = window.__TAURI_INTERNALS__;
+            }
+            console.log('Init script - window.__TAURI__:', window.__TAURI__);
+            "#
+        )
         .build()
         .map_err(|e| format!("Failed to create window: {}", e))?;
         
