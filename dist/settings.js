@@ -98,6 +98,20 @@ class SettingsManager {
         // Modal buttons
         document.getElementById('modal-save-btn').addEventListener('click', () => this.saveTarget());
         document.getElementById('modal-cancel-btn').addEventListener('click', () => this.hideModal());
+        
+        // Import button and modal handlers
+        const importBtn = document.getElementById('import-target-btn');
+        console.log('Import button found:', importBtn);
+        if (importBtn) {
+            importBtn.addEventListener('click', () => {
+                console.log('Import button clicked');
+                this.showImportModal();
+            });
+        } else {
+            console.error('Import button not found!');
+        }
+        
+        // Import modal button handlers are now inline in HTML
         document.getElementById('copy-code-btn').addEventListener('click', () => this.copyCode());
         
         // Preferences
@@ -191,7 +205,7 @@ class SettingsManager {
                 </div>
                 <div class="target-actions">
                     <button class="btn btn-small btn-secondary" onclick="window.settingsManager.editTarget('${target.id}')">Edit</button>
-                    <button class="btn btn-small btn-secondary" onclick="window.settingsManager.removeTarget('${target.id}')">Remove</button>
+                    <button class="btn btn-small btn-danger" onclick="if(confirm('Remove this target?')) window.removeTargetDirect('${target.id}')">Remove</button>
                 </div>
             </div>
         `).join('');
@@ -306,11 +320,18 @@ class SettingsManager {
     removeTarget(targetId) {
         console.log('Removing target:', targetId);
         
-        // Use a more reliable confirmation method
-        const confirmed = window.confirm('Are you sure you want to remove this target?');
-        if (!confirmed) {
-            console.log('Remove cancelled');
-            return;
+        // Check if confirm is being blocked or returning false
+        try {
+            const confirmed = confirm('Are you sure you want to remove this target?');
+            console.log('Confirm result:', confirmed);
+            if (!confirmed) {
+                console.log('Remove cancelled');
+                return;
+            }
+        } catch (e) {
+            console.error('Confirm dialog error:', e);
+            // Fallback: just remove without confirmation for now
+            console.log('Removing without confirmation due to error');
         }
         
         console.log('Before remove, targets:', this.settings.targets.length);
@@ -324,6 +345,37 @@ class SettingsManager {
         
         this.hasChanges = true;
         this.renderTargets();
+    }
+    
+    // Direct remove without extra confirmation (for testing)
+    async removeTargetDirect(targetId) {
+        console.log('Direct remove target:', targetId);
+        
+        const targetToRemove = this.settings.targets.find(t => t.id === targetId);
+        if (!targetToRemove) {
+            console.error('Target not found:', targetId);
+            return;
+        }
+        
+        console.log('Removing target:', targetToRemove.label);
+        this.settings.targets = this.settings.targets.filter(t => t.id !== targetId);
+        console.log('Targets after removal:', this.settings.targets.length);
+        
+        // If removed primary, make first target primary
+        if (targetToRemove.is_primary && this.settings.targets.length > 0) {
+            this.settings.targets[0].is_primary = true;
+        }
+        
+        this.hasChanges = true;
+        this.renderTargets();
+        
+        // Auto-save
+        try {
+            await this.saveSettings();
+            console.log('Settings saved after removal');
+        } catch (e) {
+            console.error('Failed to save after removal:', e);
+        }
     }
     
     // Record hotkey
@@ -446,6 +498,94 @@ class SettingsManager {
         document.getElementById('target-modal').classList.remove('active');
     }
     
+    // Show import modal
+    showImportModal() {
+        console.log('showImportModal called');
+        const modal = document.getElementById('import-modal');
+        console.log('Import modal found:', modal);
+        if (modal) {
+            // Try both classes in case CSS uses different one
+            modal.classList.add('visible');
+            modal.classList.add('active');
+            modal.style.display = 'flex'; // Force display
+            document.getElementById('import-code').value = '';
+            document.getElementById('import-label').value = '';
+            setTimeout(() => {
+                document.getElementById('import-code').focus();
+            }, 100);
+        } else {
+            console.error('Import modal not found!');
+        }
+    }
+    
+    // Hide import modal
+    hideImportModal() {
+        console.log('hideImportModal called');
+        const modal = document.getElementById('import-modal');
+        if (modal) {
+            modal.classList.remove('visible');
+            modal.classList.remove('active');
+            modal.style.display = '';
+        }
+    }
+    
+    // Import target with existing code
+    async importTarget() {
+        console.log('importTarget called');
+        const code = document.getElementById('import-code').value.trim();
+        const label = document.getElementById('import-label').value.trim();
+        
+        console.log('Import values:', { code, label });
+        
+        if (!code) {
+            alert('Please enter the pairing code');
+            return;
+        }
+        
+        if (!label) {
+            alert('Please enter a label for this target');
+            return;
+        }
+        
+        // Validate code format (xxxx-xxxx-xxxx-xxxx-xxxx)
+        const codePattern = /^[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}$/;
+        if (!codePattern.test(code)) {
+            alert('Invalid code format. Expected: xxxx-xxxx-xxxx-xxxx-xxxx');
+            return;
+        }
+        
+        // Check if code already exists
+        if (this.settings.targets.some(t => t.code === code)) {
+            alert('A target with this code already exists');
+            return;
+        }
+        
+        // Create new target
+        const newTarget = {
+            id: this.generateId(),
+            label,
+            code,
+            type: 'person',
+            is_primary: this.settings.targets.length === 0,
+            call_defaults: {
+                start_with_audio: true,
+                start_with_video: true
+            },
+            created_at: new Date().toISOString(),
+            notes: 'Imported target'
+        };
+        
+        console.log('Adding new target:', newTarget);
+        this.settings.targets.push(newTarget);
+        this.hasChanges = true;
+        this.renderTargets();
+        this.hideImportModal();
+        
+        // Auto-save the settings
+        await this.saveSettings();
+        alert('Target imported successfully!');
+    }
+    
     showSuccess(message) {
         // TODO: Implement toast notifications
         console.log('Success:', message);
@@ -522,10 +662,14 @@ class SettingsManager {
 if (typeof waitForTauri === 'function') {
     waitForTauri(() => {
         window.settingsManager = new SettingsManager();
+        // Make remove function globally accessible
+        window.removeTargetDirect = (id) => window.settingsManager.removeTargetDirect(id);
     });
 } else {
     // Fallback if waitForTauri is not available
     document.addEventListener('DOMContentLoaded', () => {
         window.settingsManager = new SettingsManager();
+        // Make remove function globally accessible
+        window.removeTargetDirect = (id) => window.settingsManager.removeTargetDirect(id);
     });
 }

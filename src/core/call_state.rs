@@ -11,7 +11,8 @@
 /// What: All possible states in the call lifecycle
 /// Why: Clear state management prevents race conditions
 /// Used by: CallController, UI state management
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum CallState {
     /// No active call, ready to start
     Idle,

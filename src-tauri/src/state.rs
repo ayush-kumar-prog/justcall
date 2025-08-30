@@ -6,6 +6,7 @@
 use justcall::storage::SettingsStore;
 use crate::services::global_shortcuts::GlobalShortcutService;
 use crate::services::conference_window::ConferenceWindow;
+use crate::controllers::call_controller::CallController;
 use std::sync::Mutex;
 
 /// Application state
@@ -16,4 +17,5 @@ pub struct AppState {
     pub settings_store: Mutex<SettingsStore>,
     pub shortcuts: Mutex<GlobalShortcutService>,
     pub conference_window: Mutex<ConferenceWindow>,
+    pub call_controller: Mutex<CallController>,
 }

@@ -53,6 +53,7 @@
                 <div class="section-header">
                     <h2>Call Targets</h2>
                     <button id="add-target-btn" class="btn btn-primary">Add Target</button>
+                    <button id="import-target-btn" class="btn btn-secondary" style="margin-left: 10px;">Import Code</button>
                 </div>
                 
                 <div id="targets-list" class="targets-list">
@@ -156,6 +157,29 @@
             <button id="save-btn" class="btn btn-primary">Save Changes</button>
             <button id="cancel-btn" class="btn btn-secondary">Cancel</button>
         </footer>
+    </div>
+
+    <!-- Import Code Modal -->
+    <div id="import-modal" class="modal">
+        <div class="modal-content">
+            <h2>Import Target Code</h2>
+            <p>Paste the code shared by your partner:</p>
+            
+            <div class="form-group">
+                <label for="import-code">Pairing Code:</label>
+                <input type="text" id="import-code" placeholder="xxxx-xxxx-xxxx-xxxx-xxxx">
+            </div>
+            
+            <div class="form-group">
+                <label for="import-label">Label:</label>
+                <input type="text" id="import-label" placeholder="Partner's Name">
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="window.settingsManager.importTarget()">Import</button>
+                <button class="btn btn-secondary" onclick="window.settingsManager.hideImportModal()">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <!-- Add/Edit Target Modal -->
