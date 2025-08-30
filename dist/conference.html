@@ -108,35 +108,40 @@
     
     <script src="https://meet.jit.si/external_api.js"></script>
     <script type="module">
-        // Wait for Tauri API to be available
-        function waitForTauri() {
-            return new Promise((resolve) => {
-                if (window.__TAURI__) {
-                    resolve();
-                } else if (window.__TAURI_INTERNALS__) {
-                    // Tauri v2 compatibility
-                    window.__TAURI__ = {
-                        event: window.__TAURI_INTERNALS__.event,
-                        window: window.__TAURI_INTERNALS__.window,
-                        invoke: window.__TAURI_INTERNALS__.invoke
-                    };
-                    resolve();
-                } else {
-                    setTimeout(() => waitForTauri().then(resolve), 100);
-                }
-            });
-        }
-
-        await waitForTauri();
-        console.log('Tauri API ready');
+        console.log('Conference page script starting...');
         console.log('window.__TAURI__:', window.__TAURI__);
-        console.log('window.__TAURI__.event:', window.__TAURI__.event);
-        console.log('window.__TAURI__.window:', window.__TAURI__.window);
+        console.log('window.__TAURI_INTERNALS__:', window.__TAURI_INTERNALS__);
         
-        // Import Tauri API
-        const { event, window: tauriWindow } = window.__TAURI__;
-        console.log('Destructured event:', event);
-        console.log('Destructured tauriWindow:', tauriWindow);
+        // Try to access the event system directly
+        let event = null;
+        let tauriWindow = null;
+        
+        // Wait a bit for Tauri to inject the API
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        console.log('After delay - window.__TAURI__:', window.__TAURI__);
+        console.log('After delay - window.__TAURI_INTERNALS__:', window.__TAURI_INTERNALS__);
+        
+        // Try different ways to access the API
+        if (window.__TAURI_INTERNALS__) {
+            console.log('Using __TAURI_INTERNALS__');
+            event = window.__TAURI_INTERNALS__.event;
+            tauriWindow = window.__TAURI_INTERNALS__.window;
+        } else if (window.__TAURI__) {
+            console.log('Using __TAURI__');
+            event = window.__TAURI__.event;
+            tauriWindow = window.__TAURI__.window;
+        }
+        
+        console.log('Final event:', event);
+        console.log('Final tauriWindow:', tauriWindow);
+        
+        if (!event || !tauriWindow) {
+            console.error('CRITICAL: Tauri API not available!');
+            console.error('Cannot proceed without event system');
+            document.getElementById('loading').innerHTML = '<p style="color: red;">Error: Tauri API not available</p>';
+            return;
+        }
         
         let api = null;
         let config = null;
