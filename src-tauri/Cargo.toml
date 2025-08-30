@@ -26,3 +26,4 @@ tauri-plugin-log = "2"
 tauri-plugin-global-shortcut = "2"
 justcall = { path = ".." }
 dirs = "5.0"
+urlencoding = "2.1"

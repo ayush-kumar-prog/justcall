@@ -110,6 +110,21 @@
     
     <!-- Try loading the Tauri API script explicitly -->
     <script type="module">
+        // Check URL parameters first
+        const urlParams = new URLSearchParams(window.location.search);
+        const configParam = urlParams.get('config');
+        if (configParam) {
+            try {
+                const decodedConfig = decodeURIComponent(configParam);
+                const config = JSON.parse(decodedConfig);
+                console.log('=== CONFIG FROM URL PARAMETER ===');
+                console.log('Config:', config);
+                window.__urlConfig = config;
+            } catch (e) {
+                console.error('Failed to parse config from URL:', e);
+            }
+        }
+        
         // Try importing Tauri API modules
         try {
             const { event: importedEvent, window: importedWindow } = await import('@tauri-apps/api');
@@ -136,31 +151,60 @@
         console.log('After delay - window.__TAURI__:', window.__TAURI__);
         console.log('After delay - window.__TAURI_INTERNALS__:', window.__TAURI_INTERNALS__);
         
-        // Try different ways to access the API
-        if (window.__TAURI_INTERNALS__) {
-            console.log('Using __TAURI_INTERNALS__');
-            const keys = Object.keys(window.__TAURI_INTERNALS__);
-            console.log('Keys in __TAURI_INTERNALS__:', keys);
+        // Use the available Tauri API
+        if (window.__TAURI__) {
+            console.log('Using __TAURI__ API');
             
-            // Log what's actually in there
-            keys.forEach(key => {
-                console.log(`__TAURI_INTERNALS__.${key}:`, window.__TAURI_INTERNALS__[key]);
-            });
+            // Create event emulation using available API
+            event = {
+                listen: (eventName, handler) => {
+                    console.log(`Setting up listener for ${eventName}`);
+                    
+                    // Set up a callback for this event
+                    const callbackId = window.__TAURI__.transformCallback((data) => {
+                        console.log(`Received event ${eventName}:`, data);
+                        handler({ payload: data });
+                    });
+                    
+                    // Register the callback with a known pattern
+                    window[`__tauri_event_${eventName}`] = callbackId;
+                    console.log(`Registered callback ${callbackId} for event ${eventName}`);
+                    
+                    return Promise.resolve({ 
+                        unlisten: () => {
+                            window.__TAURI__.unregisterCallback(callbackId);
+                            delete window[`__tauri_event_${eventName}`];
+                        }
+                    });
+                }
+            };
             
-            event = window.__TAURI_INTERNALS__.event;
-            tauriWindow = window.__TAURI_INTERNALS__.window;
-        } else if (window.__TAURI__) {
-            console.log('Using __TAURI__');
-            const tauriKeys = Object.keys(window.__TAURI__);
-            console.log('Keys in __TAURI__:', tauriKeys);
-            
-            // Log what's in __TAURI__
-            tauriKeys.forEach(key => {
-                console.log(`__TAURI__.${key}:`, window.__TAURI__[key]);
-            });
-            
-            event = window.__TAURI__.event;
-            tauriWindow = window.__TAURI__.window;
+            // Create window emulation
+            tauriWindow = {
+                getCurrent: () => {
+                    const metadata = window.__TAURI__.metadata;
+                    return {
+                        label: metadata.currentWindow.label,
+                        emit: (eventName, payload) => {
+                            console.log(`Emitting ${eventName} with payload:`, payload);
+                            // Try using invoke to communicate with Rust
+                            return window.__TAURI__.invoke('emit_to_window', {
+                                window: metadata.currentWindow.label,
+                                event: eventName,
+                                payload: payload
+                            }).catch(err => {
+                                console.log('Invoke failed, trying postMessage');
+                                // Fallback to postMessage
+                                window.__TAURI__.postMessage({
+                                    cmd: 'emit',
+                                    event: eventName,
+                                    payload: payload
+                                });
+                            });
+                        }
+                    };
+                }
+            };
         }
         
         // Also check if we can access via window.opener or parent
@@ -438,6 +482,20 @@
         // Initialize
         const container = document.getElementById('jitsi-container');
         const bridge = new JitsiBridge(container);
+        
+        // Make bridge globally accessible for eval injection
+        window.bridge = bridge;
+        
+        // Check if config was already injected or passed via URL
+        if (window.__injectedConfig) {
+            console.log('Found injected config:', window.__injectedConfig);
+            config = window.__injectedConfig;
+            bridge.createMeeting(config);
+        } else if (window.__urlConfig) {
+            console.log('Using config from URL parameter:', window.__urlConfig);
+            config = window.__urlConfig;
+            bridge.createMeeting(config);
+        }
         
         // Handle start-call event from Rust
         event.listen('start-call', (evt) => {

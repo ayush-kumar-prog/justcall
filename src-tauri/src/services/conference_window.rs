@@ -69,10 +69,16 @@ impl ConferenceWindow {
         
         // Create new window
         let window_label = "conference";
+        
+        // Encode config as URL parameter
+        let config_json = serde_json::to_string(&config).unwrap_or_default();
+        let encoded_config = urlencoding::encode(&config_json);
+        let url = format!("conference.html?config={}", encoded_config);
+        
         let window = WebviewWindowBuilder::new(
             &self.app_handle,
             window_label,
-            WebviewUrl::App("conference.html".into())
+            WebviewUrl::App(url.into())
         )
         .title("JustCall")
         .inner_size(1024.0, 768.0)
@@ -101,15 +107,41 @@ impl ConferenceWindow {
         let config_clone = config.clone();
         let app_handle = self.app_handle.clone();
         
+        // Clone for different approach
+        let window_clone2 = window.clone();
+        let config_json = serde_json::to_string(&config).unwrap_or_default();
+        
         // Wait for DOM ready before showing and emitting config
         window.once("dom-ready", move |event| {
             log::info!("Conference window DOM ready event received: {:?}", event);
             log::info!("Emitting start-call with config: {:?}", &config_clone);
             
-            // Send room configuration
+            // Try the original emit approach
             match window_clone.emit("start-call", &config_clone) {
                 Ok(_) => log::info!("Successfully emitted start-call event"),
-                Err(e) => log::error!("Failed to emit start-call: {}", e),
+                Err(e) => {
+                    log::error!("Failed to emit start-call: {}", e);
+                    
+                    // Fallback: Try using eval to inject the config directly
+                    let js_code = format!(
+                        r#"
+                        console.log('Injecting config via eval');
+                        if (window.bridge && window.bridge.createMeeting) {{
+                            const config = {};
+                            console.log('Creating meeting with injected config:', config);
+                            window.bridge.createMeeting(config);
+                        }} else {{
+                            console.error('Bridge not ready, storing config for later');
+                            window.__injectedConfig = {};
+                        }}
+                        "#,
+                        config_json, config_json
+                    );
+                    
+                    if let Err(e) = window_clone2.eval(&js_code) {
+                        log::error!("Failed to inject config via eval: {}", e);
+                    }
+                }
             }
             
             // Show window after config sent
