@@ -152,9 +152,11 @@ pub fn run() {
                             // Get primary target from settings
                             let settings_store = state.settings_store.lock().unwrap();
                             if let Some(target) = settings_store.get_primary_target() {
+                                log::info!("Primary target found: {} with code: {}", target.label, target.code);
                                 let room_id = justcall::core::room_id_from_code(&target.code);
+                                log::info!("Generated room ID from code '{}': '{}'", target.code, room_id);
                                 let config = ConferenceConfig {
-                                    room_id,
+                                    room_id: room_id.clone(),
                                     display_name: "You".to_string(),
                                     start_with_audio_muted: !target.call_defaults.start_with_audio,
                                     start_with_video_muted: !target.call_defaults.start_with_video,

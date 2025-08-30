@@ -108,6 +108,28 @@
     
     <script src="https://meet.jit.si/external_api.js"></script>
     <script type="module">
+        // Wait for Tauri API to be available
+        function waitForTauri() {
+            return new Promise((resolve) => {
+                if (window.__TAURI__) {
+                    resolve();
+                } else if (window.__TAURI_INTERNALS__) {
+                    // Tauri v2 compatibility
+                    window.__TAURI__ = {
+                        event: window.__TAURI_INTERNALS__.event,
+                        window: window.__TAURI_INTERNALS__.window,
+                        invoke: window.__TAURI_INTERNALS__.invoke
+                    };
+                    resolve();
+                } else {
+                    setTimeout(() => waitForTauri().then(resolve), 100);
+                }
+            });
+        }
+
+        await waitForTauri();
+        console.log('Tauri API ready');
+        
         // Import Tauri API
         const { event, window: tauriWindow } = window.__TAURI__;
         
@@ -349,7 +371,10 @@
         
         // Handle start-call event from Rust
         event.listen('start-call', (evt) => {
-            console.log('Received start-call event:', evt.payload);
+            console.log('=== START CALL EVENT RECEIVED ===');
+            console.log('Full payload:', JSON.stringify(evt.payload, null, 2));
+            console.log('Room ID:', evt.payload.room_id);
+            console.log('Jitsi URL will be: https://meet.jit.si/' + evt.payload.room_id);
             config = evt.payload;
             bridge.createMeeting(config);
         });

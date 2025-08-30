@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Jitsi Connection</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #jitsi-container { width: 800px; height: 600px; border: 2px solid #ccc; margin-top: 20px; }
+        .info { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Test Jitsi Connection</h1>
+    
+    <div class="info">
+        <strong>Your code:</strong> 7aap-ofsd-vxrb-nu4c-ei4z<br>
+        <strong>Generated room ID:</strong> jc-rggejhvgqeeesdsg<br>
+        <strong>Full URL:</strong> https://meet.jit.si/jc-rggejhvgqeeesdsg
+    </div>
+    
+    <p>Open this file on both MacBooks and click "Join Room" to test if Jitsi works correctly.</p>
+    
+    <button onclick="joinRoom()">Join Room</button>
+    
+    <div id="jitsi-container"></div>
+    
+    <script src="https://meet.jit.si/external_api.js"></script>
+    <script>
+        let api = null;
+        
+        function joinRoom() {
+            if (api) {
+                api.dispose();
+            }
+            
+            const roomName = 'jc-rggejhvgqeeesdsg';
+            console.log('Joining room:', roomName);
+            
+            api = new JitsiMeetExternalAPI('meet.jit.si', {
+                roomName: roomName,
+                width: 800,
+                height: 600,
+                parentNode: document.getElementById('jitsi-container'),
+                configOverwrite: {
+                    prejoinPageEnabled: false,
+                    startWithAudioMuted: false,
+                    startWithVideoMuted: false,
+                },
+                interfaceConfigOverwrite: {
+                    SHOW_JITSI_WATERMARK: false,
+                    SHOW_WATERMARK_FOR_GUESTS: false,
+                }
+            });
+            
+            api.addListener('videoConferenceJoined', () => {
+                console.log('Successfully joined!');
+                alert('Connected to room: ' + roomName);
+            });
+            
+            api.addListener('videoConferenceLeft', () => {
+                console.log('Left the room');
+            });
+            
+            api.addListener('connectionFailed', () => {
+                console.error('Connection failed!');
+                alert('Failed to connect to Jitsi');
+            });
+        }
+    </script>
+</body>
+</html>
