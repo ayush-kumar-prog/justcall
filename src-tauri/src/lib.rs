@@ -1,19 +1,22 @@
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    Manager, WebviewUrl, WebviewWindowBuilder,
+    Listener, Manager, WebviewUrl, WebviewWindowBuilder,
 };
 
 mod commands;
 mod state;
+mod services;
 
 use state::AppState;
+use services::global_shortcuts::{GlobalShortcutService, ShortcutAction};
 use std::sync::Mutex;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_log::Builder::new().build())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .setup(|app| {
             // Initialize settings store
             let settings_store = match justcall::storage::SettingsStore::load() {
@@ -30,9 +33,22 @@ pub fn run() {
                 }
             };
             
+            // Create global shortcut service
+            let mut shortcuts_service = GlobalShortcutService::new(app.handle().clone());
+            
+            // Setup default hotkeys from settings
+            {
+                let store = &settings_store;
+                let settings = store.settings();
+                if let Err(e) = shortcuts_service.setup_default_hotkeys(&settings.keybinds) {
+                    log::error!("Failed to setup default hotkeys: {}", e);
+                }
+            }
+            
             // Set up app state
             app.manage(AppState {
                 settings_store: Mutex::new(settings_store),
+                shortcuts: Mutex::new(shortcuts_service),
             });
             // Create menu items
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
@@ -109,6 +125,30 @@ pub fn run() {
                 window.hide()?;
             }
             
+            // Listen for hotkey events
+            let app_handle = app.handle().clone();
+            app.listen("hotkey-pressed", move |event| {
+                log::info!("Hotkey event received: {:?}", event.payload());
+                
+                // Parse the action
+                if let Ok(action) = serde_json::from_str::<ShortcutAction>(event.payload()) {
+                    match action {
+                        ShortcutAction::JoinPrimary => {
+                            // TODO: Implement call controller
+                            log::info!("TODO: Join primary target");
+                        }
+                        ShortcutAction::JoinTarget { id } => {
+                            // TODO: Implement call controller
+                            log::info!("TODO: Join target {}", id);
+                        }
+                        ShortcutAction::Hangup => {
+                            // TODO: Implement call controller
+                            log::info!("TODO: Hangup call");
+                        }
+                    }
+                }
+            });
+            
             log::info!("JustCall initialized successfully");
             Ok(())
         })
@@ -116,6 +156,8 @@ pub fn run() {
             commands::get_settings,
             commands::save_settings,
             commands::generate_code,
+            commands::validate_hotkey,
+            commands::test_hotkey,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
