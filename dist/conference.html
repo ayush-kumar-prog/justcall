@@ -107,8 +107,11 @@
     <div id="jitsi-container"></div>
     
     <script src="https://meet.jit.si/external_api.js"></script>
+    
+    <!-- Try loading the Tauri API script explicitly -->
     <script type="module">
         console.log('Conference page script starting...');
+        console.log('Initial window:', window);
         console.log('window.__TAURI__:', window.__TAURI__);
         console.log('window.__TAURI_INTERNALS__:', window.__TAURI_INTERNALS__);
         
@@ -125,13 +128,20 @@
         // Try different ways to access the API
         if (window.__TAURI_INTERNALS__) {
             console.log('Using __TAURI_INTERNALS__');
+            console.log('Keys in __TAURI_INTERNALS__:', Object.keys(window.__TAURI_INTERNALS__));
             event = window.__TAURI_INTERNALS__.event;
             tauriWindow = window.__TAURI_INTERNALS__.window;
         } else if (window.__TAURI__) {
             console.log('Using __TAURI__');
+            console.log('Keys in __TAURI__:', Object.keys(window.__TAURI__));
             event = window.__TAURI__.event;
             tauriWindow = window.__TAURI__.window;
         }
+        
+        // Also check if we can access via window.opener or parent
+        console.log('window.opener:', window.opener);
+        console.log('window.parent:', window.parent);
+        console.log('window.top:', window.top);
         
         console.log('Final event:', event);
         console.log('Final tauriWindow:', tauriWindow);
@@ -139,8 +149,24 @@
         if (!event || !tauriWindow) {
             console.error('CRITICAL: Tauri API not available!');
             console.error('Cannot proceed without event system');
-            document.getElementById('loading').innerHTML = '<p style="color: red;">Error: Tauri API not available</p>';
-            return;
+            console.log('Attempting fallback approach...');
+            
+            // Try using window message passing as fallback
+            window.addEventListener('message', (e) => {
+                console.log('Received window message:', e);
+                if (e.data && e.data.type === 'start-call') {
+                    console.log('=== START CALL EVENT RECEIVED VIA POSTMESSAGE ===');
+                    config = e.data.payload;
+                    bridge.createMeeting(config);
+                }
+            });
+            
+            // Signal that we're ready via a different method
+            console.log('Sending ready signal via console log');
+            console.log('CONFERENCE_WINDOW_READY');
+            
+            // Don't return, continue with the bridge setup
+            // return;
         }
         
         let api = null;
