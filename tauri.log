@@ -1,0 +1,391 @@
+
+> justcall@1.0.0 tauri
+> tauri dev
+
+     Running BeforeDevCommand (`npm run dev`)
+
+> justcall@1.0.0 dev
+> http-server dist -p 1420 -c-1
+
+Starting up http-server, serving dist
+
+http-server version: 14.1.1
+
+http-server settings: 
+CORS: disabled
+Cache: -1 seconds
+Connection Timeout: 120 seconds
+Directory Listings: visible
+AutoIndex: visible
+Serve GZIP Files: false
+Serve Brotli Files: false
+Default File Extension: none
+
+Available on:
+  http://127.0.0.1:1420
+  http://30.24.187.66:1420
+Hit CTRL-C to stop the server
+
+     Running DevCommand (`cargo  run --no-default-features --color always --`)
+        Info Watching /Users/kumar/Documents/Projects/justcall/justcall/src-tauri for changes...
+[1m[32m   Compiling[0m justcall v0.1.0 (/Users/kumar/Documents/Projects/justcall/justcall)
+[1m[36m    Building[0m [=======================> ] 392/395: justcall                    [K[1m[32m   Compiling[0m app v0.1.0 (/Users/kumar/Documents/Projects/justcall/justcall/src-tauri)
+[1m[36m    Building[0m [=======================> ] 393/395: app                         [K[0m[1m[33mwarning[0m[0m[1m: unused variable: `app_handle`[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/services/global_shortcuts.rs:63:13[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m63[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let app_handle = self.app_handle.clone();[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m             [0m[0m[1m[33m^^^^^^^^^^[0m[0m [0m[0m[1m[33mhelp: if this is intentional, prefix it with an underscore: `_app_handle`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(unused_variables)]` on by default[0m
+
+[1m[36m    Building[0m [=======================> ] 393/395: app                         [K[0m[1m[33mwarning[0m[0m[1m: unused variable: `app_handle`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0msrc/lib.rs:129:17[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m129[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            let app_handle = app.handle().clone();[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                 [0m[0m[1m[33m^^^^^^^^^^[0m[0m [0m[0m[1m[33mhelp: if this is intentional, prefix it with an underscore: `_app_handle`[0m
+
+[1m[36m    Building[0m [=======================> ] 393/395: app                         [K[0m[1m[33mwarning[0m[0m[1m: method `get_registered_hotkeys` is never used[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0msrc/services/global_shortcuts.rs:168:12[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m27[0m[0m  [0m[0m[1m[38;5;12m|[0m[0m [0m[0mimpl GlobalShortcutService {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m [0m[0m[1m[38;5;12m--------------------------[0m[0m [0m[0m[1m[38;5;12mmethod in this implementation[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m168[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn get_registered_hotkeys(&self) -> &HashMap<String, ShortcutAction> {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m            [0m[0m[1m[33m^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(dead_code)]` on by default[0m
+
+[1m[36m    Building[0m [=======================> ] 393/395: app                         [K[1m[33mwarning[0m[1m:[0m `app` (lib) generated 3 warnings
+[1m[36m    Building[0m [=======================> ] 394/395: app(bin)                    [K[1m[32m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`dev` profile [unoptimized + debuginfo]]8;;\ target(s) in 4.33s
+[1m[32m     Running[0m `target/debug/app`
+[2025-08-29][23:57:02][tao::platform_impl::platform::app_delegate][TRACE] Triggered `applicationDidFinishLaunching`
+[2025-08-29][23:57:02][tao::platform_impl::platform::window][TRACE] Creating new window
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Triggered `viewDidMoveToWindow`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Completed `viewDidMoveToWindow`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::window][TRACE] Locked shared state in `set_fullscreen`
+[2025-08-29][23:57:02][tao::platform_impl::platform::window][TRACE] Unlocked shared state in `set_fullscreen`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Triggered `viewDidMoveToWindow`
+[2025-08-29][23:57:02][tao::platform_impl::platform::view][TRACE] Completed `viewDidMoveToWindow`
+[2025-08-29][23:57:02][app_lib::services::global_shortcuts][INFO] Setting up default hotkeys
+[2025-08-29][23:57:02][app_lib::services::global_shortcuts][INFO] Registering hotkey: Cmd+Shift+F9 -> JoinPrimary
+[2025-08-29][23:57:02][app_lib::services::global_shortcuts][INFO] Registering hotkey: Cmd+Shift+F10 -> Hangup
+[2025-08-29][23:57:02][app_lib][INFO] JustCall initialized successfully
+[2025-08-29][23:57:02][tao::platform_impl::platform::app_delegate][TRACE] Completed `applicationDidFinishLaunching`
+[Sat Aug 30 2025 00:57:02 GMT+0100 (British Summer Time)]  "GET /" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+(node:90794) [DEP0066] DeprecationWarning: OutgoingMessage.prototype._headers is deprecated
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[Sat Aug 30 2025 00:57:02 GMT+0100 (British Summer Time)]  "GET /toast.js" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[2025-08-29][23:57:13][app_lib][DEBUG] Tray event: Click { id: TrayIconId("1"), position: PhysicalPosition { x: 1015.0625, y: -1065.33203125 }, rect: Rect { position: Physical(PhysicalPosition { x: 998, y: -1080 }), size: Physical(PhysicalSize { width: 34, height: 24 }) }, button: Right, button_state: Down }
+[2025-08-29][23:57:14][app_lib][DEBUG] Tray event: Click { id: TrayIconId("1"), position: PhysicalPosition { x: 1015.0625, y: -1065.33203125 }, rect: Rect { position: Physical(PhysicalPosition { x: 998, y: -1080 }), size: Physical(PhysicalSize { width: 34, height: 24 }) }, button: Right, button_state: Down }
+[2025-08-29][23:57:16][app_lib][INFO] User selected settings from tray menu
+[2025-08-29][23:57:16][tao::platform_impl::platform::window][TRACE] Creating new window
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Triggered `viewDidMoveToWindow`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Completed `viewDidMoveToWindow`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::window][TRACE] Locked shared state in `set_fullscreen`
+[2025-08-29][23:57:16][tao::platform_impl::platform::window][TRACE] Unlocked shared state in `set_fullscreen`
+[2025-08-29][23:57:16][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidBecomeKey:`
+[2025-08-29][23:57:16][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidBecomeKey:`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Triggered `viewDidMoveToWindow`
+[2025-08-29][23:57:16][tao::platform_impl::platform::view][TRACE] Completed `viewDidMoveToWindow`
+[Sat Aug 30 2025 00:57:16 GMT+0100 (British Summer Time)]  "GET /settings.html" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[Sat Aug 30 2025 00:57:16 GMT+0100 (British Summer Time)]  "GET /styles.css" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[Sat Aug 30 2025 00:57:16 GMT+0100 (British Summer Time)]  "GET /toast.js" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[Sat Aug 30 2025 00:57:16 GMT+0100 (British Summer Time)]  "GET /settings.js" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[2025-08-29][23:57:25][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidResignKey:`
+[2025-08-29][23:57:25][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidResignKey:`
+[2025-08-29][23:57:36][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidBecomeKey:`
+[2025-08-29][23:57:36][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidBecomeKey:`
+[2025-08-29][23:58:05][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidResignKey:`
+[2025-08-29][23:58:05][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidResignKey:`
+[2025-08-29][23:58:35][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidBecomeKey:`
+[2025-08-29][23:58:35][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidBecomeKey:`
+[2025-08-29][23:58:38][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidResignKey:`
+[2025-08-29][23:58:38][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidResignKey:`
+        Info File src-tauri/src/services/global_shortcuts.rs changed. Rebuilding application...
+     Running DevCommand (`cargo  run --no-default-features --color always --`)
+        Info File src-tauri/src/services/global_shortcuts.rs changed. Rebuilding application...
+     Running DevCommand (`cargo  run --no-default-features --color always --`)
+[1m[32m   Compiling[0m app v0.1.0 (/Users/kumar/Documents/Projects/justcall/justcall/src-tauri)
+[1m[36m    Building[0m [=======================> ] 393/395: app                         [K[0m[1m[33mwarning[0m[0m[1m: unused variable: `app_handle`[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/services/global_shortcuts.rs:63:13[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m63[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let app_handle = self.app_handle.clone();[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m             [0m[0m[1m[33m^^^^^^^^^^[0m[0m [0m[0m[1m[33mhelp: if this is intentional, prefix it with an underscore: `_app_handle`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(unused_variables)]` on by default[0m
+
+[1m[36m    Building[0m [=======================> ] 393/395: app                         [K[0m[1m[33mwarning[0m[0m[1m: unused variable: `app_handle`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0msrc/lib.rs:129:17[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m129[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            let app_handle = app.handle().clone();[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                 [0m[0m[1m[33m^^^^^^^^^^[0m[0m [0m[0m[1m[33mhelp: if this is intentional, prefix it with an underscore: `_app_handle`[0m
+
+[1m[36m    Building[0m [=======================> ] 393/395: app                         [K[0m[1m[33mwarning[0m[0m[1m: method `get_registered_hotkeys` is never used[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0msrc/services/global_shortcuts.rs:169:12[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m27[0m[0m  [0m[0m[1m[38;5;12m|[0m[0m [0m[0mimpl GlobalShortcutService {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m [0m[0m[1m[38;5;12m--------------------------[0m[0m [0m[0m[1m[38;5;12mmethod in this implementation[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m169[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn get_registered_hotkeys(&self) -> &HashMap<String, ShortcutAction> {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m            [0m[0m[1m[33m^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(dead_code)]` on by default[0m
+
+[1m[36m    Building[0m [=======================> ] 393/395: app                         [K[1m[33mwarning[0m[1m:[0m `app` (lib) generated 3 warnings
+[1m[36m    Building[0m [=======================> ] 394/395: app(bin)                    [K[1m[32m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`dev` profile [unoptimized + debuginfo]]8;;\ target(s) in 4.14s
+[1m[32m     Running[0m `target/debug/app`
+[2025-08-29][23:58:44][tao::platform_impl::platform::app_delegate][TRACE] Triggered `applicationDidFinishLaunching`
+[2025-08-29][23:58:44][tao::platform_impl::platform::window][TRACE] Creating new window
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Triggered `viewDidMoveToWindow`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Completed `viewDidMoveToWindow`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::window][TRACE] Locked shared state in `set_fullscreen`
+[2025-08-29][23:58:44][tao::platform_impl::platform::window][TRACE] Unlocked shared state in `set_fullscreen`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Triggered `viewDidMoveToWindow`
+[2025-08-29][23:58:44][tao::platform_impl::platform::view][TRACE] Completed `viewDidMoveToWindow`
+[2025-08-29][23:58:44][app_lib::services::global_shortcuts][INFO] Setting up default hotkeys
+[2025-08-29][23:58:44][app_lib::services::global_shortcuts][INFO] Registering hotkey: Cmd+Shift+F9 -> JoinPrimary
+[2025-08-29][23:58:44][app_lib::services::global_shortcuts][INFO] Successfully registered hotkey: Cmd+Shift+F9
+[2025-08-29][23:58:44][app_lib::services::global_shortcuts][INFO] Registering hotkey: Cmd+Shift+F10 -> Hangup
+[2025-08-29][23:58:44][app_lib::services::global_shortcuts][INFO] Successfully registered hotkey: Cmd+Shift+F10
+[2025-08-29][23:58:44][app_lib][INFO] JustCall initialized successfully
+[2025-08-29][23:58:44][tao::platform_impl::platform::app_delegate][TRACE] Completed `applicationDidFinishLaunching`
+[Sat Aug 30 2025 00:58:44 GMT+0100 (British Summer Time)]  "GET /" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[Sat Aug 30 2025 00:58:44 GMT+0100 (British Summer Time)]  "GET /toast.js" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+        Info File src-tauri/src/services/global_shortcuts.rs changed. Rebuilding application...
+     Running DevCommand (`cargo  run --no-default-features --color always --`)
+        Info File src-tauri/src/services/global_shortcuts.rs changed. Rebuilding application...
+     Running DevCommand (`cargo  run --no-default-features --color always --`)
+[1m[32m   Compiling[0m app v0.1.0 (/Users/kumar/Documents/Projects/justcall/justcall/src-tauri)
+[1m[36m    Building[0m [=======================> ] 393/395: app                         [K[0m[1m[33mwarning[0m[0m[1m: unused variable: `app_handle`[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/services/global_shortcuts.rs:63:13[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m63[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let app_handle = self.app_handle.clone();[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m             [0m[0m[1m[33m^^^^^^^^^^[0m[0m [0m[0m[1m[33mhelp: if this is intentional, prefix it with an underscore: `_app_handle`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(unused_variables)]` on by default[0m
+
+[1m[36m    Building[0m [=======================> ] 393/395: app                         [K[0m[1m[33mwarning[0m[0m[1m: unused variable: `app_handle`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0msrc/lib.rs:129:17[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m129[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            let app_handle = app.handle().clone();[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                 [0m[0m[1m[33m^^^^^^^^^^[0m[0m [0m[0m[1m[33mhelp: if this is intentional, prefix it with an underscore: `_app_handle`[0m
+
+[1m[36m    Building[0m [=======================> ] 393/395: app                         [K[0m[1m[33mwarning[0m[0m[1m: method `get_registered_hotkeys` is never used[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0msrc/services/global_shortcuts.rs:169:12[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m27[0m[0m  [0m[0m[1m[38;5;12m|[0m[0m [0m[0mimpl GlobalShortcutService {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m [0m[0m[1m[38;5;12m--------------------------[0m[0m [0m[0m[1m[38;5;12mmethod in this implementation[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m169[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn get_registered_hotkeys(&self) -> &HashMap<String, ShortcutAction> {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m            [0m[0m[1m[33m^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(dead_code)]` on by default[0m
+
+[1m[36m    Building[0m [=======================> ] 393/395: app                         [K[1m[33mwarning[0m[1m:[0m `app` (lib) generated 3 warnings
+[1m[36m    Building[0m [=======================> ] 394/395: app(bin)                    [K[1m[32m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`dev` profile [unoptimized + debuginfo]]8;;\ target(s) in 2.91s
+[1m[32m     Running[0m `target/debug/app`
+[2025-08-29][23:59:30][tao::platform_impl::platform::app_delegate][TRACE] Triggered `applicationDidFinishLaunching`
+[2025-08-29][23:59:30][tao::platform_impl::platform::window][TRACE] Creating new window
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Triggered `viewDidMoveToWindow`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Completed `viewDidMoveToWindow`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::window][TRACE] Locked shared state in `set_fullscreen`
+[2025-08-29][23:59:30][tao::platform_impl::platform::window][TRACE] Unlocked shared state in `set_fullscreen`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Triggered `viewDidMoveToWindow`
+[2025-08-29][23:59:30][tao::platform_impl::platform::view][TRACE] Completed `viewDidMoveToWindow`
+[2025-08-29][23:59:30][app_lib::services::global_shortcuts][INFO] Setting up default hotkeys
+[2025-08-29][23:59:30][app_lib::services::global_shortcuts][INFO] Registering hotkey: Cmd+Shift+F9 -> JoinPrimary
+[2025-08-29][23:59:30][app_lib::services::global_shortcuts][INFO] Successfully registered hotkey: Cmd+Shift+F9
+[2025-08-29][23:59:30][app_lib::services::global_shortcuts][INFO] Registering hotkey: Cmd+Shift+F10 -> Hangup
+[2025-08-29][23:59:30][app_lib::services::global_shortcuts][INFO] Successfully registered hotkey: Cmd+Shift+F10
+[2025-08-29][23:59:30][app_lib][INFO] JustCall initialized successfully
+[2025-08-29][23:59:30][tao::platform_impl::platform::app_delegate][TRACE] Completed `applicationDidFinishLaunching`
+[Sat Aug 30 2025 00:59:30 GMT+0100 (British Summer Time)]  "GET /" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[Sat Aug 30 2025 00:59:30 GMT+0100 (British Summer Time)]  "GET /toast.js" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[2025-08-29][23:59:41][app_lib][DEBUG] Tray event: Click { id: TrayIconId("1"), position: PhysicalPosition { x: 1011.3125, y: -1079.046875 }, rect: Rect { position: Physical(PhysicalPosition { x: 998, y: -1080 }), size: Physical(PhysicalSize { width: 34, height: 24 }) }, button: Right, button_state: Down }
+[2025-08-29][23:59:42][app_lib][DEBUG] Tray event: Click { id: TrayIconId("1"), position: PhysicalPosition { x: 1011.3125, y: -1079.046875 }, rect: Rect { position: Physical(PhysicalPosition { x: 998, y: -1080 }), size: Physical(PhysicalSize { width: 34, height: 24 }) }, button: Left, button_state: Down }
+[2025-08-29][23:59:42][app_lib][DEBUG] Tray icon left-clicked
+[2025-08-29][23:59:43][app_lib][DEBUG] Tray event: Click { id: TrayIconId("1"), position: PhysicalPosition { x: 1011.3125, y: -1079.046875 }, rect: Rect { position: Physical(PhysicalPosition { x: 998, y: -1080 }), size: Physical(PhysicalSize { width: 34, height: 24 }) }, button: Right, button_state: Down }
+[2025-08-29][23:59:44][app_lib][INFO] User selected settings from tray menu
+[2025-08-29][23:59:44][tao::platform_impl::platform::window][TRACE] Creating new window
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Triggered `viewDidMoveToWindow`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Completed `viewDidMoveToWindow`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::window][TRACE] Locked shared state in `set_fullscreen`
+[2025-08-29][23:59:44][tao::platform_impl::platform::window][TRACE] Unlocked shared state in `set_fullscreen`
+[2025-08-29][23:59:44][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidBecomeKey:`
+[2025-08-29][23:59:44][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidBecomeKey:`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Triggered `viewDidMoveToWindow`
+[2025-08-29][23:59:44][tao::platform_impl::platform::view][TRACE] Completed `viewDidMoveToWindow`
+[Sat Aug 30 2025 00:59:44 GMT+0100 (British Summer Time)]  "GET /settings.html" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[Sat Aug 30 2025 00:59:44 GMT+0100 (British Summer Time)]  "GET /styles.css" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[Sat Aug 30 2025 00:59:44 GMT+0100 (British Summer Time)]  "GET /toast.js" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[Sat Aug 30 2025 00:59:44 GMT+0100 (British Summer Time)]  "GET /settings.js" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[2025-08-30][00:00:04][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidResignKey:`
+[2025-08-30][00:00:04][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidResignKey:`
+[2025-08-30][00:00:05][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidBecomeKey:`
+[2025-08-30][00:00:05][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidBecomeKey:`
+[2025-08-30][00:00:06][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidResignKey:`
+[2025-08-30][00:00:06][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidResignKey:`
+[2025-08-30][00:00:18][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidBecomeKey:`
+[2025-08-30][00:00:18][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidBecomeKey:`
+[2025-08-30][00:01:28][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidResignKey:`
+[2025-08-30][00:01:28][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidResignKey:`
+[2025-08-30][00:01:36][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidBecomeKey:`
+[2025-08-30][00:01:36][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidBecomeKey:`
+[2025-08-30][00:01:36][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidMove:`
+[2025-08-30][00:01:36][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidMove:`
+[2025-08-30][00:01:36][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowShouldClose:`
+[2025-08-30][00:01:36][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowShouldClose:`
+[2025-08-30][00:01:36][tao::platform_impl::platform::window][TRACE] Dropping `UnownedWindow` (0x11e63dab0)
+[2025-08-30][00:01:36][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowWillClose:`
+[2025-08-30][00:01:36][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowWillClose:`
+[2025-08-30][00:01:36][tao::platform_impl::platform::app][DEBUG] skip sending CMD keyEvent - app has no keyWindow
+[2025-08-30][00:01:37][app_lib][DEBUG] Tray event: Click { id: TrayIconId("1"), position: PhysicalPosition { x: 1030.125, y: -1063.65625 }, rect: Rect { position: Physical(PhysicalPosition { x: 1006, y: -1080 }), size: Physical(PhysicalSize { width: 34, height: 24 }) }, button: Right, button_state: Down }
+[2025-08-30][00:01:38][app_lib][INFO] User selected settings from tray menu
+[2025-08-30][00:01:38][tao::platform_impl::platform::window][TRACE] Creating new window
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Triggered `viewDidMoveToWindow`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Completed `viewDidMoveToWindow`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::window][TRACE] Locked shared state in `set_fullscreen`
+[2025-08-30][00:01:38][tao::platform_impl::platform::window][TRACE] Unlocked shared state in `set_fullscreen`
+[2025-08-30][00:01:38][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidBecomeKey:`
+[2025-08-30][00:01:38][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidBecomeKey:`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Triggered `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Completed `validAttributesForMarkedText`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Triggered `viewDidMoveToWindow`
+[2025-08-30][00:01:38][tao::platform_impl::platform::view][TRACE] Completed `viewDidMoveToWindow`
+[Sat Aug 30 2025 01:01:38 GMT+0100 (British Summer Time)]  "GET /settings.html" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[Sat Aug 30 2025 01:01:38 GMT+0100 (British Summer Time)]  "GET /styles.css" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[Sat Aug 30 2025 01:01:38 GMT+0100 (British Summer Time)]  "GET /toast.js" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[Sat Aug 30 2025 01:01:38 GMT+0100 (British Summer Time)]  "GET /settings.js" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+[2025-08-30][00:01:52][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidResignKey:`
+[2025-08-30][00:01:52][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidResignKey:`
+[2025-08-30][00:03:55][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidBecomeKey:`
+[2025-08-30][00:03:55][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidBecomeKey:`
+[2025-08-30][00:04:28][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidResignKey:`
+[2025-08-30][00:04:28][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidResignKey:`
+[2025-08-30][00:07:38][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowDidBecomeKey:`
+[2025-08-30][00:07:38][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowDidBecomeKey:`
+[2025-08-30][00:07:53][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowShouldClose:`
+[2025-08-30][00:07:53][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowShouldClose:`
+[2025-08-30][00:07:53][tao::platform_impl::platform::window][TRACE] Dropping `UnownedWindow` (0x1297ae5b0)
+[2025-08-30][00:07:53][tao::platform_impl::platform::window_delegate][TRACE] Triggered `windowWillClose:`
+[2025-08-30][00:07:53][tao::platform_impl::platform::window_delegate][TRACE] Completed `windowWillClose:`
+[2025-08-30][00:07:53][tao::platform_impl::platform::app][DEBUG] skip sending CMD keyEvent - app has no keyWindow
+       Error The "beforeDevCommand" terminated with a non-zero status code.

@@ -2,9 +2,10 @@
 <html>
 <head>
     <title>JustCall</title>
+
     <style>
-        body { 
-            margin: 0; 
+        body {
+            margin: 0;
             padding: 20px;
             font-family: system-ui, -apple-system, sans-serif;
             background: #1a1a1a;
@@ -15,5 +16,24 @@
 <body>
     <h1>JustCall</h1>
     <p>System tray app - this window should be hidden.</p>
+    
+    <script src="toast.js"></script>
+    <script>
+        // Listen for hotkey events
+        if (window.__TAURI__) {
+            window.__TAURI__.event.listen('hotkey-pressed', (event) => {
+                console.log('Hotkey pressed:', event.payload);
+                
+                // Show toast based on action
+                if (event.payload.JoinPrimary) {
+                    window.toast.info('Joining primary target...');
+                } else if (event.payload.JoinTarget) {
+                    window.toast.info(`Joining target ${event.payload.JoinTarget.id}...`);
+                } else if (event.payload.Hangup) {
+                    window.toast.info('Hanging up...');
+                }
+            });
+        }
+    </script>
 </body>
 </html>

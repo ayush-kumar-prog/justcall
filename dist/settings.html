@@ -5,6 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JustCall Settings</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        // Wait for Tauri API to be injected
+        function waitForTauri(callback) {
+            if (window.__TAURI_INTERNALS__ && window.__TAURI_INTERNALS__.invoke) {
+                // Found Tauri v2 API
+                window.__TAURI__ = window.__TAURI__ || {};
+                window.__TAURI__.invoke = function(cmd, args) {
+                    return window.__TAURI_INTERNALS__.invoke(cmd, args);
+                };
+                window.__TAURI__.window = window.__TAURI_INTERNALS__.window;
+                callback();
+            } else if (window.__TAURI__ && window.__TAURI__.invoke) {
+                // Already have Tauri API
+                callback();
+            } else {
+                // Try again in 10ms
+                setTimeout(() => waitForTauri(callback), 10);
+            }
+        }
+        
+        // Initialize when ready
+        document.addEventListener('DOMContentLoaded', function() {
+            waitForTauri(() => {
+                console.log('Tauri API is ready');
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="container">
@@ -195,6 +222,7 @@
         </div>
     </div>
 
+    <script src="toast.js"></script>
     <script type="module" src="settings.js"></script>
 </body>
 </html>

@@ -35,30 +35,30 @@ pub struct KeybindDefaults {
 ///   - If changing format, update GlobalShortcutService parser
 ///   - Keep consistent with Tauri's keybind syntax
 pub fn get_default_keybinds() -> KeybindDefaults {
-    #[cfg(target_os = "macos")]
-    {
-        KeybindDefaults {
-            join_primary: "Cmd+Opt+J".to_string(),
-            hangup: "Cmd+Opt+H".to_string(),
-            join_target_prefix: "Cmd+Opt+".to_string(),
+                #[cfg(target_os = "macos")]
+            {
+                KeybindDefaults {
+                    join_primary: "Cmd+Shift+J".to_string(),
+                    hangup: "Cmd+Shift+H".to_string(),
+                    join_target_prefix: "Cmd+Shift+".to_string(),
         }
     }
     
     #[cfg(target_os = "windows")]
     {
         KeybindDefaults {
-            join_primary: "Ctrl+Alt+J".to_string(),
-            hangup: "Ctrl+Alt+H".to_string(),
-            join_target_prefix: "Ctrl+Alt+".to_string(),
+            join_primary: "Ctrl+Shift+J".to_string(),
+            hangup: "Ctrl+Shift+H".to_string(),
+            join_target_prefix: "Ctrl+Shift+".to_string(),
         }
     }
     
     #[cfg(target_os = "linux")]
     {
         KeybindDefaults {
-            join_primary: "Ctrl+Alt+J".to_string(),
-            hangup: "Ctrl+Alt+H".to_string(),
-            join_target_prefix: "Ctrl+Alt+".to_string(),
+            join_primary: "Ctrl+Shift+J".to_string(),
+            hangup: "Ctrl+Shift+H".to_string(),
+            join_target_prefix: "Ctrl+Shift+".to_string(),
         }
     }
     

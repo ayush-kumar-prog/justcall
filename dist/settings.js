@@ -14,9 +14,22 @@ class SettingsManager {
     }
     
     async init() {
-        // Initialize Tauri API if available
-        if (window.__TAURI__) {
+        // Debug: Check what's available
+        console.log('Checking Tauri API availability...');
+        console.log('window.__TAURI__:', window.__TAURI__);
+        
+        // Try different ways to access Tauri API
+        if (window.__TAURI__ && window.__TAURI__.invoke) {
+            console.log('Tauri API found with invoke method');
             await this.loadSettings();
+        } else if (window.__TAURI__ && window.__TAURI__.tauri && window.__TAURI__.tauri.invoke) {
+            console.log('Tauri API found at window.__TAURI__.tauri.invoke');
+            // Update the invoke method reference
+            window.__TAURI__.invoke = window.__TAURI__.tauri.invoke;
+            await this.loadSettings();
+        } else if (window.__TAURI_INTERNALS__) {
+            console.log('Found __TAURI_INTERNALS__, checking for invoke...');
+            console.log('__TAURI_INTERNALS__:', window.__TAURI_INTERNALS__);
         } else {
             // Development mode - use mock data
             console.warn('Tauri API not available, using mock data');
@@ -40,20 +53,23 @@ class SettingsManager {
     
     // Save settings to Tauri backend
     async saveSettings() {
-        if (!this.hasChanges) return;
+        if (!this.hasChanges) {
+            window.toast.info('No changes to save');
+            return;
+        }
         
         try {
             await window.__TAURI__.invoke('save_settings', { settings: this.settings });
             this.hasChanges = false;
-            this.showSuccess('Settings saved successfully');
+            window.toast.success('Settings saved successfully');
             
             // Close window after short delay
             setTimeout(() => {
                 this.closeWindow();
-            }, 500);
+            }, 1000);
         } catch (error) {
             console.error('Failed to save settings:', error);
-            this.showError('Failed to save settings');
+            window.toast.error(`Failed to save settings: ${error}`);
         }
     }
     
@@ -65,9 +81,18 @@ class SettingsManager {
         });
         
         // Buttons
-        document.getElementById('close-btn').addEventListener('click', () => this.closeWindow());
-        document.getElementById('save-btn').addEventListener('click', () => this.saveSettings());
-        document.getElementById('cancel-btn').addEventListener('click', () => this.closeWindow());
+        document.getElementById('close-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.closeWindow();
+        });
+        document.getElementById('save-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.saveSettings();
+        });
+        document.getElementById('cancel-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.closeWindow();
+        });
         document.getElementById('add-target-btn').addEventListener('click', () => this.showAddTargetModal());
         
         // Modal buttons
@@ -294,33 +319,77 @@ class SettingsManager {
     }
     
     // Record hotkey
-    recordHotkey(input, keybind) {
+    async recordHotkey(input, keybind) {
         input.classList.add('recording');
         input.value = 'Press keys...';
         
-        const handler = (e) => {
-            e.preventDefault();
-            
-            const modifiers = [];
-            if (e.metaKey) modifiers.push('Cmd');
-            if (e.ctrlKey && !e.metaKey) modifiers.push('Ctrl');
-            if (e.altKey) modifiers.push('Alt');
-            if (e.shiftKey) modifiers.push('Shift');
-            
-            if (e.key && !['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) {
-                const key = e.key.length === 1 ? e.key.toUpperCase() : e.key;
-                const hotkey = [...modifiers, key].join('+');
-                
-                input.value = hotkey;
-                this.settings.keybinds[keybind] = hotkey;
-                this.hasChanges = true;
-                
-                input.classList.remove('recording');
-                document.removeEventListener('keydown', handler);
+        let currentModifiers = [];
+        
+        const updateDisplay = () => {
+            if (currentModifiers.length > 0) {
+                input.value = currentModifiers.join('+') + '+...';
+            } else {
+                input.value = 'Press keys...';
             }
         };
         
+        const handler = async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Update modifiers
+            currentModifiers = [];
+            if (e.metaKey) currentModifiers.push('Cmd');
+            if (e.ctrlKey && !e.metaKey) currentModifiers.push('Ctrl');
+            if (e.altKey) currentModifiers.push('Alt');
+            if (e.shiftKey) currentModifiers.push('Shift');
+            
+            // Show current modifiers
+            updateDisplay();
+            
+            if (e.key && !['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) {
+                const key = e.key.length === 1 ? e.key.toUpperCase() : e.key;
+                const hotkey = [...currentModifiers, key].join('+');
+                
+                // Test if hotkey can be registered
+                if (window.__TAURI__) {
+                    try {
+                        await window.__TAURI__.invoke('test_hotkey', { hotkey });
+                        // Success - hotkey is valid
+                        input.value = hotkey;
+                        this.settings.keybinds[keybind] = hotkey;
+                        this.hasChanges = true;
+                        window.toast.success(`Hotkey set: ${hotkey}`);
+                    } catch (error) {
+                        // Failed - show error
+                        window.toast.error(`Invalid hotkey: ${error}`);
+                        input.value = this.settings.keybinds[keybind];
+                    }
+                } else {
+                    // Development mode - just set it
+                    input.value = hotkey;
+                    this.settings.keybinds[keybind] = hotkey;
+                    this.hasChanges = true;
+                }
+                
+                input.classList.remove('recording');
+                document.removeEventListener('keydown', handler);
+                document.removeEventListener('keyup', keyupHandler);
+            }
+        };
+        
+        const keyupHandler = (e) => {
+            // Update modifiers on key release
+            currentModifiers = [];
+            if (e.metaKey) currentModifiers.push('Cmd');
+            if (e.ctrlKey && !e.metaKey) currentModifiers.push('Ctrl');
+            if (e.altKey) currentModifiers.push('Alt');
+            if (e.shiftKey) currentModifiers.push('Shift');
+            updateDisplay();
+        };
+        
         document.addEventListener('keydown', handler);
+        document.addEventListener('keyup', keyupHandler);
         
         // Cancel on click outside
         setTimeout(() => {
@@ -328,6 +397,7 @@ class SettingsManager {
                 input.classList.remove('recording');
                 input.value = this.settings.keybinds[keybind];
                 document.removeEventListener('keydown', handler);
+                document.removeEventListener('keyup', keyupHandler);
             }, { once: true });
         }, 100);
     }
@@ -379,15 +449,29 @@ class SettingsManager {
         alert(message);
     }
     
-    closeWindow() {
+    async closeWindow() {
         if (this.hasChanges) {
             if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
                 return;
             }
         }
         
-        if (window.__TAURI__) {
-            window.__TAURI__.window.getCurrent().close();
+        if (window.__TAURI__ && window.__TAURI__.window) {
+            try {
+                const { getCurrent } = window.__TAURI__.window;
+                const currentWindow = getCurrent();
+                await currentWindow.close();
+            } catch (error) {
+                console.error('Failed to close window:', error);
+                // Fallback - hide the window
+                try {
+                    const { getCurrent } = window.__TAURI__.window;
+                    const currentWindow = getCurrent();
+                    await currentWindow.hide();
+                } catch (hideError) {
+                    console.error('Failed to hide window:', hideError);
+                }
+            }
         } else {
             window.close();
         }
@@ -416,9 +500,9 @@ class SettingsManager {
                 theme: 'system'
             },
             keybinds: {
-                join_primary: 'Cmd+Opt+J',
-                hangup: 'Cmd+Opt+H',
-                join_target_prefix: 'Cmd+Opt+'
+                join_primary: 'Cmd+Shift+J',
+                hangup: 'Cmd+Shift+H',
+                join_target_prefix: 'Cmd+Shift+'
             },
             targets: []
         };
@@ -426,4 +510,14 @@ class SettingsManager {
 }
 
 // Initialize settings manager
-const settingsManager = new SettingsManager();
+// Wait for Tauri API before initializing
+if (typeof waitForTauri === 'function') {
+    waitForTauri(() => {
+        const settingsManager = new SettingsManager();
+    });
+} else {
+    // Fallback if waitForTauri is not available
+    document.addEventListener('DOMContentLoaded', () => {
+        const settingsManager = new SettingsManager();
+    });
+}
