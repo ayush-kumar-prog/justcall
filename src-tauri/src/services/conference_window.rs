@@ -92,6 +92,12 @@ impl ConferenceWindow {
         .initialization_script(
             r#"
             console.log('Conference window initialization script running...');
+            
+            // Override user agent to make Jitsi think we're Chrome
+            Object.defineProperty(navigator, 'userAgent', {
+                get: function() { return 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'; }
+            });
+            
             // Ensure Tauri API is available
             if (!window.__TAURI__ && window.__TAURI_INTERNALS__) {
                 window.__TAURI__ = window.__TAURI_INTERNALS__;
