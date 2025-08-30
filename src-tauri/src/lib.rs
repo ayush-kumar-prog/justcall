@@ -7,10 +7,12 @@ use tauri::{
 mod commands;
 mod state;
 mod services;
+mod controllers;
 
 use state::AppState;
 use services::global_shortcuts::{GlobalShortcutService, ShortcutAction};
 use services::conference_window::{ConferenceWindow, ConferenceConfig};
+use controllers::call_controller::CallController;
 use std::sync::Mutex;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -49,11 +51,15 @@ pub fn run() {
             // Create conference window manager
             let conference_window = ConferenceWindow::new(app.handle().clone());
             
+            // Create call controller
+            let call_controller = CallController::new(app.handle().clone());
+            
             // Set up app state
             app.manage(AppState {
                 settings_store: Mutex::new(settings_store),
                 shortcuts: Mutex::new(shortcuts_service),
                 conference_window: Mutex::new(conference_window),
+                call_controller: Mutex::new(call_controller),
             });
             // Create menu items
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
@@ -154,12 +160,15 @@ pub fn run() {
                                     start_with_video_muted: !target.call_defaults.start_with_video,
                                     always_on_top: settings_store.settings().app_settings.always_on_top,
                                 };
+                                let target_id = target.id.clone();
                                 drop(settings_store);
                                 
-                                // Open conference window
+                                // Use call controller
+                                let controller = state.call_controller.lock().unwrap();
                                 let mut window = state.conference_window.lock().unwrap();
-                                if let Err(e) = window.open(config) {
-                                    log::error!("Failed to open conference window: {}", e);
+                                if let Err(e) = controller.join(target_id, &mut window, config) {
+                                    log::error!("Failed to join call: {}", e);
+                                    // TODO: Show toast notification
                                 }
                             } else {
                                 log::warn!("No primary target configured");
@@ -181,10 +190,12 @@ pub fn run() {
                                 };
                                 drop(settings_store);
                                 
-                                // Open conference window
+                                // Use call controller
+                                let controller = state.call_controller.lock().unwrap();
                                 let mut window = state.conference_window.lock().unwrap();
-                                if let Err(e) = window.open(config) {
-                                    log::error!("Failed to open conference window: {}", e);
+                                if let Err(e) = controller.join(id.clone(), &mut window, config) {
+                                    log::error!("Failed to join call: {}", e);
+                                    // TODO: Show toast notification
                                 }
                             } else {
                                 log::warn!("Target {} not found", id);
@@ -193,12 +204,32 @@ pub fn run() {
                         ShortcutAction::Hangup => {
                             log::info!("Hangup requested");
                             
-                            // Close conference window
+                            // Use call controller
+                            let controller = state.call_controller.lock().unwrap();
                             let mut window = state.conference_window.lock().unwrap();
-                            window.close();
+                            if let Err(e) = controller.hangup(&mut window) {
+                                log::error!("Failed to hangup: {}", e);
+                            }
                         }
                     }
                 }
+            });
+            
+            // Listen for conference events
+            let app_handle_clone = app.handle().clone();
+            app.listen("videoConferenceJoined", move |_| {
+                log::info!("Conference joined event received");
+                let state = app_handle_clone.state::<AppState>();
+                let controller = state.call_controller.lock().unwrap();
+                controller.on_conference_joined();
+            });
+            
+            let app_handle_clone2 = app.handle().clone();
+            app.listen("videoConferenceLeft", move |_| {
+                log::info!("Conference left event received");
+                let state = app_handle_clone2.state::<AppState>();
+                let controller = state.call_controller.lock().unwrap();
+                controller.on_conference_left();
             });
             
             log::info!("JustCall initialized successfully");

@@ -100,6 +100,12 @@ class SettingsManager {
         document.getElementById('modal-cancel-btn').addEventListener('click', () => this.hideModal());
         document.getElementById('copy-code-btn').addEventListener('click', () => this.copyCode());
         
+        // Import button - check if it exists (modal might not be open yet)
+        const importBtn = document.getElementById('import-code-btn');
+        if (importBtn) {
+            importBtn.addEventListener('click', () => this.toggleImportMode());
+        }
+        
         // Preferences
         document.getElementById('autostart').addEventListener('change', (e) => {
             this.settings.app_settings.autostart = e.target.checked;
@@ -434,6 +440,41 @@ class SettingsManager {
         } catch (error) {
             console.error('Failed to copy:', error);
             this.showError('Failed to copy code');
+        }
+    }
+    
+    // Toggle import mode for pairing code
+    toggleImportMode() {
+        const codeInput = document.getElementById('target-code');
+        const importBtn = document.getElementById('import-code-btn');
+        const hint = document.getElementById('code-hint');
+        
+        if (!importBtn) return; // Button not in DOM yet
+        
+        if (codeInput.readOnly) {
+            // Enable import mode
+            codeInput.readOnly = false;
+            codeInput.value = '';
+            codeInput.placeholder = 'Paste or type code here';
+            codeInput.focus();
+            importBtn.textContent = 'Cancel';
+            hint.textContent = 'Paste the code from your partner';
+        } else {
+            // Cancel import mode
+            codeInput.readOnly = true;
+            codeInput.placeholder = '';
+            importBtn.textContent = 'Import';
+            hint.textContent = 'Share this code with your call partner';
+            
+            // Restore original code or generate new one
+            if (this.editingTargetId) {
+                const target = this.settings.targets.find(t => t.id === this.editingTargetId);
+                codeInput.value = target ? target.code : '';
+            } else {
+                this.generateCode().then(code => {
+                    codeInput.value = code;
+                });
+            }
         }
     }
     
