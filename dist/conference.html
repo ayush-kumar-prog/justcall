@@ -110,6 +110,17 @@
     
     <!-- Try loading the Tauri API script explicitly -->
     <script type="module">
+        // Try importing Tauri API modules
+        try {
+            const { event: importedEvent, window: importedWindow } = await import('@tauri-apps/api');
+            console.log('Successfully imported Tauri API modules');
+            console.log('Imported event:', importedEvent);
+            console.log('Imported window:', importedWindow);
+            window.__IMPORTED_TAURI__ = { event: importedEvent, window: importedWindow };
+        } catch (e) {
+            console.log('Failed to import Tauri modules:', e.message);
+        }
+        
         console.log('Conference page script starting...');
         console.log('Initial window:', window);
         console.log('window.__TAURI__:', window.__TAURI__);
@@ -128,12 +139,26 @@
         // Try different ways to access the API
         if (window.__TAURI_INTERNALS__) {
             console.log('Using __TAURI_INTERNALS__');
-            console.log('Keys in __TAURI_INTERNALS__:', Object.keys(window.__TAURI_INTERNALS__));
+            const keys = Object.keys(window.__TAURI_INTERNALS__);
+            console.log('Keys in __TAURI_INTERNALS__:', keys);
+            
+            // Log what's actually in there
+            keys.forEach(key => {
+                console.log(`__TAURI_INTERNALS__.${key}:`, window.__TAURI_INTERNALS__[key]);
+            });
+            
             event = window.__TAURI_INTERNALS__.event;
             tauriWindow = window.__TAURI_INTERNALS__.window;
         } else if (window.__TAURI__) {
             console.log('Using __TAURI__');
-            console.log('Keys in __TAURI__:', Object.keys(window.__TAURI__));
+            const tauriKeys = Object.keys(window.__TAURI__);
+            console.log('Keys in __TAURI__:', tauriKeys);
+            
+            // Log what's in __TAURI__
+            tauriKeys.forEach(key => {
+                console.log(`__TAURI__.${key}:`, window.__TAURI__[key]);
+            });
+            
             event = window.__TAURI__.event;
             tauriWindow = window.__TAURI__.window;
         }
@@ -142,6 +167,13 @@
         console.log('window.opener:', window.opener);
         console.log('window.parent:', window.parent);
         console.log('window.top:', window.top);
+        
+        // Try using imported modules if available
+        if (!event && window.__IMPORTED_TAURI__) {
+            console.log('Using imported Tauri modules');
+            event = window.__IMPORTED_TAURI__.event;
+            tauriWindow = window.__IMPORTED_TAURI__.window;
+        }
         
         console.log('Final event:', event);
         console.log('Final tauriWindow:', tauriWindow);
