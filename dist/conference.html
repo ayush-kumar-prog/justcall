@@ -129,12 +129,19 @@
 
         await waitForTauri();
         console.log('Tauri API ready');
+        console.log('window.__TAURI__:', window.__TAURI__);
+        console.log('window.__TAURI__.event:', window.__TAURI__.event);
+        console.log('window.__TAURI__.window:', window.__TAURI__.window);
         
         // Import Tauri API
         const { event, window: tauriWindow } = window.__TAURI__;
+        console.log('Destructured event:', event);
+        console.log('Destructured tauriWindow:', tauriWindow);
         
         let api = null;
         let config = null;
+        
+        console.log('About to create JitsiBridge...');
         
         // JitsiBridge implementation
         class JitsiBridge {
@@ -398,7 +405,7 @@
         setTimeout(() => {
             console.log('Emitting dom-ready event to Rust');
             // Emit to the current window instead of app-level
-            const currentWindow = window.__TAURI__.window.getCurrent();
+            const currentWindow = tauriWindow.getCurrent();
             console.log('Current window:', currentWindow);
             console.log('Current window label:', currentWindow.label);
             currentWindow.emit('dom-ready', {}).then(() => {
