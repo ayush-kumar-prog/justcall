@@ -394,9 +394,21 @@
             bridge.executeCommand('toggleVideo');
         });
         
-        // Notify Rust that DOM is ready
-        event.emit('dom-ready', {});
-        console.log('Conference page ready');
+        // Wait a bit for event listeners to be set up, then notify Rust
+        setTimeout(() => {
+            console.log('Emitting dom-ready event to Rust');
+            event.emit('dom-ready', {});
+            console.log('Conference page ready');
+            console.log('Waiting for start-call event...');
+        }, 100);
+        
+        // Debug: Show a message if no event received after 5 seconds
+        setTimeout(() => {
+            if (!config) {
+                console.error('No start-call event received after 5 seconds!');
+                document.getElementById('loading').innerHTML = '<p style="color: red;">Error: No call configuration received</p>';
+            }
+        }, 5000);
         
         // Cleanup on window close
         window.addEventListener('beforeunload', () => {

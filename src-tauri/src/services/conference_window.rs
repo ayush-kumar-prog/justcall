@@ -92,12 +92,15 @@ impl ConferenceWindow {
         let app_handle = self.app_handle.clone();
         
         // Wait for DOM ready before showing and emitting config
-        window.once("dom-ready", move |_| {
-            log::info!("Conference window DOM ready, emitting config");
+        window.once("dom-ready", move |event| {
+            log::info!("Conference window DOM ready event received: {:?}", event);
+            log::info!("Emitting start-call with config: {:?}", &config_clone);
             
             // Send room configuration
-            window_clone.emit("start-call", &config_clone)
-                .unwrap_or_else(|e| log::error!("Failed to emit start-call: {}", e));
+            match window_clone.emit("start-call", &config_clone) {
+                Ok(_) => log::info!("Successfully emitted start-call event"),
+                Err(e) => log::error!("Failed to emit start-call: {}", e),
+            }
             
             // Show window after config sent
             let _ = window_clone.show();
