@@ -190,8 +190,8 @@ class SettingsManager {
                     </div>
                 </div>
                 <div class="target-actions">
-                    <button class="btn btn-small btn-secondary" onclick="settingsManager.editTarget('${target.id}')">Edit</button>
-                    <button class="btn btn-small btn-secondary" onclick="settingsManager.removeTarget('${target.id}')">Remove</button>
+                    <button class="btn btn-small btn-secondary" onclick="window.settingsManager.editTarget('${target.id}')">Edit</button>
+                    <button class="btn btn-small btn-secondary" onclick="window.settingsManager.removeTarget('${target.id}')">Remove</button>
                 </div>
             </div>
         `).join('');
@@ -244,10 +244,10 @@ class SettingsManager {
         document.getElementById('target-label').value = target.label;
         document.getElementById('target-code').value = target.code;
         document.getElementById('target-notes').value = target.notes || '';
-        document.querySelector(`input[name="target-type"][value="${target.target_type}"]`).checked = true;
+        document.querySelector(`input[name="target-type"][value="${target.type || target.target_type}"]`).checked = true;
         document.getElementById('target-primary').checked = target.is_primary;
-        document.getElementById('start-audio-muted').checked = target.call_defaults.start_audio_muted;
-        document.getElementById('start-video-muted').checked = target.call_defaults.start_video_muted;
+        document.getElementById('start-audio-muted').checked = !target.call_defaults.start_with_audio;
+        document.getElementById('start-video-muted').checked = !target.call_defaults.start_with_video;
         
         this.showModal();
     }
@@ -263,12 +263,11 @@ class SettingsManager {
         const targetData = {
             label,
             code: document.getElementById('target-code').value,
-            target_type: document.querySelector('input[name="target-type"]:checked').value,
+            type: document.querySelector('input[name="target-type"]:checked').value,
             is_primary: document.getElementById('target-primary').checked,
             call_defaults: {
-                start_audio_muted: document.getElementById('start-audio-muted').checked,
-                start_video_muted: document.getElementById('start-video-muted').checked,
-                e2ee_enabled: false
+                start_with_audio: !document.getElementById('start-audio-muted').checked,
+                start_with_video: !document.getElementById('start-video-muted').checked
             },
             notes: document.getElementById('target-notes').value.trim() || null
         };
@@ -305,9 +304,18 @@ class SettingsManager {
     
     // Remove target
     removeTarget(targetId) {
-        if (!confirm('Are you sure you want to remove this target?')) return;
+        console.log('Removing target:', targetId);
         
+        // Use a more reliable confirmation method
+        const confirmed = window.confirm('Are you sure you want to remove this target?');
+        if (!confirmed) {
+            console.log('Remove cancelled');
+            return;
+        }
+        
+        console.log('Before remove, targets:', this.settings.targets.length);
         this.settings.targets = this.settings.targets.filter(t => t.id !== targetId);
+        console.log('After remove, targets:', this.settings.targets.length);
         
         // If removed primary, make first target primary
         if (this.settings.targets.length > 0 && !this.settings.targets.some(t => t.is_primary)) {
@@ -513,11 +521,11 @@ class SettingsManager {
 // Wait for Tauri API before initializing
 if (typeof waitForTauri === 'function') {
     waitForTauri(() => {
-        const settingsManager = new SettingsManager();
+        window.settingsManager = new SettingsManager();
     });
 } else {
     // Fallback if waitForTauri is not available
     document.addEventListener('DOMContentLoaded', () => {
-        const settingsManager = new SettingsManager();
+        window.settingsManager = new SettingsManager();
     });
 }

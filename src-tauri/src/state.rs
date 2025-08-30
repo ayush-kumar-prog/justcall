@@ -5,9 +5,15 @@
 
 use justcall::storage::SettingsStore;
 use crate::services::global_shortcuts::GlobalShortcutService;
+use crate::services::conference_window::ConferenceWindow;
 use std::sync::Mutex;
 
+/// Application state
+/// What: Central state management for the app
+/// Why: Provides thread-safe access to services and stores
+/// Used by: Commands, event handlers, app setup
 pub struct AppState {
     pub settings_store: Mutex<SettingsStore>,
     pub shortcuts: Mutex<GlobalShortcutService>,
+    pub conference_window: Mutex<ConferenceWindow>,
 }

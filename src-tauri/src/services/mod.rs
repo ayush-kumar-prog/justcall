@@ -4,3 +4,4 @@
 // Used by: lib.rs, commands.rs
 
 pub mod global_shortcuts;
+pub mod conference_window;

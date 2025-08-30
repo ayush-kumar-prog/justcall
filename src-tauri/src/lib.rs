@@ -10,6 +10,7 @@ mod services;
 
 use state::AppState;
 use services::global_shortcuts::{GlobalShortcutService, ShortcutAction};
+use services::conference_window::{ConferenceWindow, ConferenceConfig};
 use std::sync::Mutex;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -45,10 +46,14 @@ pub fn run() {
                 }
             }
             
+            // Create conference window manager
+            let conference_window = ConferenceWindow::new(app.handle().clone());
+            
             // Set up app state
             app.manage(AppState {
                 settings_store: Mutex::new(settings_store),
                 shortcuts: Mutex::new(shortcuts_service),
+                conference_window: Mutex::new(conference_window),
             });
             // Create menu items
             let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
@@ -132,18 +137,65 @@ pub fn run() {
                 
                 // Parse the action
                 if let Ok(action) = serde_json::from_str::<ShortcutAction>(event.payload()) {
+                    let state = app_handle.state::<AppState>();
+                    
                     match action {
                         ShortcutAction::JoinPrimary => {
-                            // TODO: Implement call controller
-                            log::info!("TODO: Join primary target");
+                            log::info!("Join primary target requested");
+                            
+                            // Get primary target from settings
+                            let settings_store = state.settings_store.lock().unwrap();
+                            if let Some(target) = settings_store.get_primary_target() {
+                                let room_id = justcall::core::room_id_from_code(&target.code);
+                                let config = ConferenceConfig {
+                                    room_id,
+                                    display_name: "You".to_string(),
+                                    start_with_audio_muted: !target.call_defaults.start_with_audio,
+                                    start_with_video_muted: !target.call_defaults.start_with_video,
+                                    always_on_top: settings_store.settings().app_settings.always_on_top,
+                                };
+                                drop(settings_store);
+                                
+                                // Open conference window
+                                let mut window = state.conference_window.lock().unwrap();
+                                if let Err(e) = window.open(config) {
+                                    log::error!("Failed to open conference window: {}", e);
+                                }
+                            } else {
+                                log::warn!("No primary target configured");
+                            }
                         }
                         ShortcutAction::JoinTarget { id } => {
-                            // TODO: Implement call controller
-                            log::info!("TODO: Join target {}", id);
+                            log::info!("Join target {} requested", id);
+                            
+                            // Get target from settings
+                            let settings_store = state.settings_store.lock().unwrap();
+                            if let Some(target) = settings_store.get_target(&id) {
+                                let room_id = justcall::core::room_id_from_code(&target.code);
+                                let config = ConferenceConfig {
+                                    room_id,
+                                    display_name: "You".to_string(),
+                                    start_with_audio_muted: !target.call_defaults.start_with_audio,
+                                    start_with_video_muted: !target.call_defaults.start_with_video,
+                                    always_on_top: settings_store.settings().app_settings.always_on_top,
+                                };
+                                drop(settings_store);
+                                
+                                // Open conference window
+                                let mut window = state.conference_window.lock().unwrap();
+                                if let Err(e) = window.open(config) {
+                                    log::error!("Failed to open conference window: {}", e);
+                                }
+                            } else {
+                                log::warn!("Target {} not found", id);
+                            }
                         }
                         ShortcutAction::Hangup => {
-                            // TODO: Implement call controller
-                            log::info!("TODO: Hangup call");
+                            log::info!("Hangup requested");
+                            
+                            // Close conference window
+                            let mut window = state.conference_window.lock().unwrap();
+                            window.close();
                         }
                     }
                 }

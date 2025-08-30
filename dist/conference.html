@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustCall</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        #jitsi-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 100;
+        }
+        
+        #loading.hidden {
+            display: none;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 100;
+            display: none;
+            max-width: 400px;
+            padding: 20px;
+        }
+        
+        #error.visible {
+            display: block;
+        }
+        
+        #error h3 {
+            color: #ff4444;
+            margin-bottom: 10px;
+        }
+        
+        #error button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #4488ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        #error button:hover {
+            background: #3377ee;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+        <p>Connecting to call...</p>
+    </div>
+    
+    <div id="error">
+        <h3>Connection Error</h3>
+        <p id="error-message">Failed to connect to the call</p>
+        <button onclick="window.location.reload()">Retry</button>
+    </div>
+    
+    <div id="jitsi-container"></div>
+    
+    <script src="https://meet.jit.si/external_api.js"></script>
+    <script type="module">
+        // Import Tauri API
+        const { event, window: tauriWindow } = window.__TAURI__;
+        
+        let api = null;
+        let config = null;
+        
+        // JitsiBridge implementation
+        class JitsiBridge {
+            constructor(container) {
+                this.container = container;
+                this.api = null;
+            }
+            
+            /**
+             * createMeeting(options)
+             * What: Creates the Jitsi iFrame API instance, subscribes to core events
+             * Contract:
+             * - prejoin disabled; mic/cam defaults from config
+             * - emits to Rust: 'videoConferenceJoined', 'videoConferenceLeft', 'participantJoined'
+             * Used by: start-call event handler
+             * Calls: JitsiMeetExternalAPI constructor
+             * Change notes: If you change event names, update CallController event handlers
+             */
+            async createMeeting(options) {
+                console.log('Creating Jitsi meeting:', options);
+                
+                try {
+                    // Hide loading, show container
+                    document.getElementById('loading').classList.add('hidden');
+                    
+                    // Create Jitsi API instance
+                    this.api = new JitsiMeetExternalAPI('meet.jit.si', {
+                        roomName: options.room_id,
+                        width: '100%',
+                        height: '100%',
+                        parentNode: this.container,
+                        userInfo: {
+                            displayName: options.display_name || 'JustCall User'
+                        },
+                        configOverwrite: {
+                            startWithAudioMuted: options.start_with_audio_muted || false,
+                            startWithVideoMuted: options.start_with_video_muted || false,
+                            disableModeratorIndicator: true,
+                            enableEmailInStats: false,
+                            prejoinPageEnabled: false,  // Skip prejoin screen
+                            disableThirdPartyRequests: true,
+                            disableDeepLinking: true,
+                            enableWelcomePage: false,
+                            defaultLanguage: 'en',
+                            disableProfile: true,
+                            disableInviteFunctions: true,
+                            doNotStoreRoom: true,
+                            enableClosePage: false,
+                            hideConferenceSubject: true,
+                            hideConferenceTimer: false,
+                            disableRemoteMute: true,
+                            noSSL: false,
+                            enableNoisyMicDetection: true,
+                            resolution: 720,
+                            constraints: {
+                                video: {
+                                    height: {
+                                        ideal: 720,
+                                        max: 1080,
+                                        min: 240
+                                    }
+                                }
+                            },
+                            // Disable unnecessary features
+                            toolbarButtons: [
+                                'microphone', 'camera', 'closedcaptions', 'desktop',
+                                'fullscreen', 'fodeviceselection', 'hangup', 'profile',
+                                'raisehand', 'settings', 'videoquality', 'filmstrip',
+                                'stats', 'shortcuts', 'tileview', 'download', 'help'
+                            ],
+                            disableReactions: true,
+                            disablePolls: true,
+                            disableSelfView: false,
+                            disableShortcuts: false,
+                            disable1On1Mode: false,
+                        },
+                        interfaceConfigOverwrite: {
+                            SHOW_JITSI_WATERMARK: false,
+                            SHOW_WATERMARK_FOR_GUESTS: false,
+                            SHOW_BRAND_WATERMARK: false,
+                            GENERATE_ROOMNAMES_ON_WELCOME_PAGE: false,
+                            DISPLAY_WELCOME_PAGE_CONTENT: false,
+                            APP_NAME: 'JustCall',
+                            NATIVE_APP_NAME: 'JustCall',
+                            PROVIDER_NAME: '',
+                            LANG_DETECTION: false,
+                            TOOLBAR_ALWAYS_VISIBLE: false,
+                            TOOLBAR_TIMEOUT: 4000,
+                            DEFAULT_BACKGROUND: '#474747',
+                            DISABLE_VIDEO_BACKGROUND: false,
+                            INITIAL_TOOLBAR_TIMEOUT: 20000,
+                            DISABLE_JOIN_LEAVE_NOTIFICATIONS: false,
+                            SHOW_POWERED_BY: false,
+                            SHOW_PROMOTIONAL_CLOSE_PAGE: false,
+                            HIDE_INVITE_MORE_HEADER: true,
+                            MOBILE_APP_PROMO: false,
+                            TILE_VIEW_MAX_COLUMNS: 5,
+                            VIDEO_QUALITY_LABEL_DISABLED: false,
+                            CONNECTION_INDICATOR_DISABLED: false,
+                            VIDEO_LAYOUT_FIT: 'both',
+                            VERTICAL_FILMSTRIP: true,
+                            FILM_STRIP_MAX_HEIGHT: 120,
+                            DISABLE_FOCUS_INDICATOR: false,
+                            DISABLE_DOMINANT_SPEAKER_INDICATOR: false,
+                            DISABLE_TRANSCRIPTION_SUBTITLES: true,
+                            DISABLE_RINGING: false,
+                            SETTINGS_SECTIONS: ['devices', 'language', 'moderator', 'profile', 'calendar'],
+                            // Notification settings
+                            ENABLE_LOBBY: false,
+                            AUTO_PIN_LATEST_SCREEN_SHARE: true,
+                            ENABLE_LAYOUT_CONSTRAINTS: true,
+                        }
+                    });
+                    
+                    // Bind event listeners
+                    this.api.addListener('videoConferenceJoined', () => {
+                        console.log('Conference joined');
+                        event.emit('videoConferenceJoined', {});
+                    });
+                    
+                    this.api.addListener('videoConferenceLeft', () => {
+                        console.log('Conference left');
+                        event.emit('videoConferenceLeft', {});
+                        // Close window after leaving
+                        setTimeout(() => {
+                            tauriWindow.getCurrent().close();
+                        }, 500);
+                    });
+                    
+                    this.api.addListener('participantJoined', (participant) => {
+                        console.log('Participant joined:', participant);
+                        event.emit('participantJoined', participant);
+                        
+                        // Play a sound if configured
+                        if (config?.play_join_sound) {
+                            this.playJoinSound();
+                        }
+                    });
+                    
+                    this.api.addListener('participantLeft', (participant) => {
+                        console.log('Participant left:', participant);
+                        event.emit('participantLeft', participant);
+                    });
+                    
+                    this.api.addListener('readyToClose', () => {
+                        console.log('Ready to close');
+                        event.emit('readyToClose', {});
+                        tauriWindow.getCurrent().close();
+                    });
+                    
+                    // Error handling
+                    this.api.addListener('errorOccurred', (error) => {
+                        console.error('Jitsi error:', error);
+                        this.showError(error.message || 'An error occurred');
+                    });
+                    
+                    this.api.addListener('connectionFailed', () => {
+                        console.error('Connection failed');
+                        this.showError('Failed to connect to the meeting');
+                    });
+                    
+                } catch (error) {
+                    console.error('Failed to create meeting:', error);
+                    this.showError(error.message);
+                }
+            }
+            
+            /**
+             * hangup()
+             * What: Ends the current call
+             * Used by: end-call event, hangup hotkey
+             * Calls: api.executeCommand('hangup')
+             */
+            hangup() {
+                if (this.api) {
+                    console.log('Hanging up');
+                    this.api.executeCommand('hangup');
+                }
+            }
+            
+            /**
+             * executeCommand(command, ...args)
+             * What: Executes Jitsi API commands
+             * Used by: Future features (mute, toggle video, etc)
+             */
+            executeCommand(command, ...args) {
+                if (this.api) {
+                    this.api.executeCommand(command, ...args);
+                }
+            }
+            
+            /**
+             * dispose()
+             * What: Cleanup Jitsi instance
+             * Used by: Window close, cleanup
+             */
+            dispose() {
+                if (this.api) {
+                    this.api.dispose();
+                    this.api = null;
+                }
+            }
+            
+            showError(message) {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error-message').textContent = message;
+                document.getElementById('error').classList.add('visible');
+            }
+            
+            playJoinSound() {
+                // Simple beep sound using Web Audio API
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 800; // Frequency in Hz
+                    gainNode.gain.value = 0.1; // Volume
+                    
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.1); // 100ms beep
+                } catch (e) {
+                    console.warn('Could not play join sound:', e);
+                }
+            }
+        }
+        
+        // Initialize
+        const container = document.getElementById('jitsi-container');
+        const bridge = new JitsiBridge(container);
+        
+        // Handle start-call event from Rust
+        event.listen('start-call', (evt) => {
+            console.log('Received start-call event:', evt.payload);
+            config = evt.payload;
+            bridge.createMeeting(config);
+        });
+        
+        // Handle end-call event from Rust
+        event.listen('end-call', () => {
+            console.log('Received end-call event');
+            bridge.hangup();
+        });
+        
+        // Handle other commands
+        event.listen('toggle-mute', () => {
+            bridge.executeCommand('toggleAudio');
+        });
+        
+        event.listen('toggle-video', () => {
+            bridge.executeCommand('toggleVideo');
+        });
+        
+        // Notify Rust that DOM is ready
+        event.emit('dom-ready', {});
+        console.log('Conference page ready');
+        
+        // Cleanup on window close
+        window.addEventListener('beforeunload', () => {
+            bridge.dispose();
+        });
+    </script>
+</body>
+</html>
+

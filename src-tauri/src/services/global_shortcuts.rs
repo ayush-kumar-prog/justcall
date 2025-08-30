@@ -60,7 +60,6 @@ impl GlobalShortcutService {
         }
         
         // Clone values for the closure
-        let app_handle = self.app_handle.clone();
         let action_clone = action.clone();
         let hotkey_str = hotkey.to_string();
         
