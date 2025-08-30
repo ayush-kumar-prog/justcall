@@ -397,7 +397,15 @@
         // Wait a bit for event listeners to be set up, then notify Rust
         setTimeout(() => {
             console.log('Emitting dom-ready event to Rust');
-            event.emit('dom-ready', {});
+            // Emit to the current window instead of app-level
+            const currentWindow = window.__TAURI__.window.getCurrent();
+            console.log('Current window:', currentWindow);
+            console.log('Current window label:', currentWindow.label);
+            currentWindow.emit('dom-ready', {}).then(() => {
+                console.log('Successfully emitted dom-ready to window');
+            }).catch(err => {
+                console.error('Failed to emit dom-ready:', err);
+            });
             console.log('Conference page ready');
             console.log('Waiting for start-call event...');
         }, 100);
