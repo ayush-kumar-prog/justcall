@@ -9,6 +9,10 @@ pub struct ExternalBrowserService;
 impl ExternalBrowserService {
     /// Opens a meeting URL in the system's default browser
     pub fn open_meeting(app_handle: &AppHandle, room_id: &str) -> Result<(), String> {
+        // You can easily switch to a different service here:
+        // - Daily.co: format!("https://justcall.daily.co/{}", room_id)
+        // - Whereby: format!("https://justcall.whereby.com/{}", room_id)  
+        // - Jami: format!("https://meet.jami.net/{}", room_id)
         let url = format!("https://meet.jit.si/{}", room_id);
         
         log::info!("Opening meeting in external browser: {}", url);

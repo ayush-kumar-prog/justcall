@@ -39,9 +39,9 @@ pub fn room_id_from_code(code: &str) -> String {
     // Encode to base32 and take first 16 chars (~80 bits)
     let encoded = BASE32_NOPAD.encode(&hash_result).to_lowercase();
     
-    // Format: "jc-" prefix + 16 chars
-    // Jitsi accepts alphanumeric room names, we use base32 subset
-    format!("jc-{}", &encoded[..16])
+    // Use a more friendly room name format that doesn't trigger auth
+    // Format: "JustCallRoom" + 8 chars (looks more like a regular meeting room)
+    format!("JustCallRoom{}", &encoded[..8])
 }
 
 #[cfg(test)]
@@ -66,11 +66,11 @@ mod tests {
     #[test]
     fn test_room_format() {
         let room = room_id_from_code("test");
-        assert!(room.starts_with("jc-"), "Room must start with 'jc-'");
-        assert_eq!(room.len(), 19, "Room should be 'jc-' + 16 chars");
+        assert!(room.starts_with("JustCallRoom"), "Room must start with 'JustCallRoom'");
+        assert_eq!(room.len(), 20, "Room should be 'JustCallRoom' + 8 chars");
         
         // Verify only lowercase alphanumeric after prefix
-        let suffix = &room[3..];
+        let suffix = &room[12..];
         assert!(suffix.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit()),
                 "Room ID should only contain lowercase alphanumeric");
     }
@@ -92,8 +92,8 @@ mod tests {
         let room = room_id_from_code(&code);
         
         // Should work and produce valid room
-        assert!(room.starts_with("jc-"));
-        assert_eq!(room.len(), 19);
+        assert!(room.starts_with("JustCallRoom"));
+        assert_eq!(room.len(), 20);
         
         // Same code twice = same room
         let room2 = room_id_from_code(&code);
@@ -105,8 +105,8 @@ mod tests {
     #[test]
     fn test_empty_code() {
         let room = room_id_from_code("");
-        assert!(room.starts_with("jc-"));
-        assert_eq!(room.len(), 19);
+        assert!(room.starts_with("JustCallRoom"));
+        assert_eq!(room.len(), 20);
         // Empty input should still produce valid room
     }
     
@@ -114,8 +114,8 @@ mod tests {
     fn test_very_long_code() {
         let long_code = "a".repeat(10000);
         let room = room_id_from_code(&long_code);
-        assert!(room.starts_with("jc-"));
-        assert_eq!(room.len(), 19);
+        assert!(room.starts_with("JustCallRoom"));
+        assert_eq!(room.len(), 20);
         // Should handle long inputs without panic
     }
     
@@ -133,11 +133,11 @@ mod tests {
         
         for test_code in test_cases {
             let room = room_id_from_code(test_code);
-            assert!(room.starts_with("jc-"), "Failed for: {}", test_code);
-            assert_eq!(room.len(), 19, "Failed for: {}", test_code);
+            assert!(room.starts_with("JustCallRoom"), "Failed for: {}", test_code);
+            assert_eq!(room.len(), 20, "Failed for: {}", test_code);
             
             // Only base32 chars in output
-            let suffix = &room[3..];
+            let suffix = &room[12..];
             assert!(
                 suffix.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit()),
                 "Invalid chars in room for input: {}", test_code
