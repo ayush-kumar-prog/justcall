@@ -5,3 +5,4 @@
 
 pub mod global_shortcuts;
 pub mod conference_window;
+pub mod external_browser;

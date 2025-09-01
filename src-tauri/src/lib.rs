@@ -20,6 +20,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_log::Builder::new().build())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             // Initialize settings store
             let settings_store = match justcall::storage::SettingsStore::load() {
@@ -165,11 +166,10 @@ pub fn run() {
                                 let target_id = target.id.clone();
                                 drop(settings_store);
                                 
-                                // Use call controller
-                                let controller = state.call_controller.lock().unwrap();
-                                let mut window = state.conference_window.lock().unwrap();
-                                if let Err(e) = controller.join(target_id, &mut window, config) {
-                                    log::error!("Failed to join call: {}", e);
+                                // Open directly in browser instead of using conference window
+                                use services::external_browser::ExternalBrowserService;
+                                if let Err(e) = ExternalBrowserService::open_meeting(&app_handle, &room_id) {
+                                    log::error!("Failed to open meeting in browser: {}", e);
                                     // TODO: Show toast notification
                                 }
                             } else {
@@ -183,20 +183,12 @@ pub fn run() {
                             let settings_store = state.settings_store.lock().unwrap();
                             if let Some(target) = settings_store.get_target(&id) {
                                 let room_id = justcall::core::room_id_from_code(&target.code);
-                                let config = ConferenceConfig {
-                                    room_id,
-                                    display_name: "You".to_string(),
-                                    start_with_audio_muted: !target.call_defaults.start_with_audio,
-                                    start_with_video_muted: !target.call_defaults.start_with_video,
-                                    always_on_top: settings_store.settings().app_settings.always_on_top,
-                                };
                                 drop(settings_store);
                                 
-                                // Use call controller
-                                let controller = state.call_controller.lock().unwrap();
-                                let mut window = state.conference_window.lock().unwrap();
-                                if let Err(e) = controller.join(id.clone(), &mut window, config) {
-                                    log::error!("Failed to join call: {}", e);
+                                // Open directly in browser instead of using conference window
+                                use services::external_browser::ExternalBrowserService;
+                                if let Err(e) = ExternalBrowserService::open_meeting(&app_handle, &room_id) {
+                                    log::error!("Failed to open meeting in browser: {}", e);
                                     // TODO: Show toast notification
                                 }
                             } else {
@@ -204,14 +196,8 @@ pub fn run() {
                             }
                         }
                         ShortcutAction::Hangup => {
-                            log::info!("Hangup requested");
-                            
-                            // Use call controller
-                            let controller = state.call_controller.lock().unwrap();
-                            let mut window = state.conference_window.lock().unwrap();
-                            if let Err(e) = controller.hangup(&mut window) {
-                                log::error!("Failed to hangup: {}", e);
-                            }
+                            log::info!("Hangup requested - not applicable when using external browser");
+                            // When using external browser, users must close the browser tab/window manually
                         }
                     }
                 }
