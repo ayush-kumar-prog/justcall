@@ -2,20 +2,13 @@
   "identifier": "main-window",
   "windows": ["main", "conference", "settings"],
   "permissions": [
-    "path:default",
-    "event:default",
-    "window:default",
-    "app:default",
-    "resources:default",
-    "menu:default",
-    "tray:default",
-    "shell:allow-open",
-    {
-      "identifier": "shell:allow-open",
-      "allow": [
-        { "domain": "https://meet.jit.si/*" },
-        { "domain": "https://8x8.vc/*" }
-      ]
-    }
+    "core:path:default",
+    "core:event:default",
+    "core:window:default",
+    "core:app:default",
+    "core:resources:default",
+    "core:menu:default",
+    "core:tray:default",
+    "shell:allow-open"
   ]
 }
