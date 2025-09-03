@@ -81,17 +81,9 @@ class SettingsManager {
         });
         
         // Buttons
-        document.getElementById('close-btn').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.closeWindow();
-        });
         document.getElementById('save-btn').addEventListener('click', (e) => {
             e.preventDefault();
             this.saveSettings();
-        });
-        document.getElementById('cancel-btn').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.closeWindow();
         });
         document.getElementById('add-target-btn').addEventListener('click', () => this.showAddTargetModal());
         
@@ -127,10 +119,7 @@ class SettingsManager {
             this.hasChanges = true;
         });
         
-        document.getElementById('theme').addEventListener('change', (e) => {
-            this.settings.app_settings.theme = e.target.value;
-            this.hasChanges = true;
-        });
+
         
         // Hotkey inputs
         document.getElementById('join-primary').addEventListener('click', (e) => {
@@ -215,7 +204,7 @@ class SettingsManager {
         document.getElementById('always-on-top').checked = this.settings.app_settings.always_on_top;
         document.getElementById('play-join-sound').checked = this.settings.app_settings.play_join_sound;
         document.getElementById('show-notifications').checked = this.settings.app_settings.show_notifications;
-        document.getElementById('theme').value = this.settings.app_settings.theme;
+
     }
     
     // Show add target modal
@@ -309,27 +298,51 @@ class SettingsManager {
     }
     
     // Remove target
-    removeTarget(targetId) {
+    async removeTarget(targetId) {
         console.log('Removing target:', targetId);
         
-        // Use a more reliable confirmation method
-        const confirmed = window.confirm('Are you sure you want to remove this target?');
+        // Create a custom confirmation dialog to avoid issues with window.confirm
+        const confirmed = await this.showConfirmDialog('Remove Target', 'Are you sure you want to remove this target? This action cannot be undone.');
         if (!confirmed) {
-            console.log('Remove cancelled');
+            console.log('Remove cancelled by user');
             return;
         }
         
-        console.log('Before remove, targets:', this.settings.targets.length);
-        this.settings.targets = this.settings.targets.filter(t => t.id !== targetId);
-        console.log('After remove, targets:', this.settings.targets.length);
-        
-        // If removed primary, make first target primary
-        if (this.settings.targets.length > 0 && !this.settings.targets.some(t => t.is_primary)) {
-            this.settings.targets[0].is_primary = true;
+        try {
+            // Call Tauri backend to remove target and persist changes
+            if (window.__TAURI__ && window.__TAURI__.invoke) {
+                console.log('Calling Tauri remove_target command');
+                const success = await window.__TAURI__.invoke('remove_target', { id: targetId });
+                
+                if (success) {
+                    // Reload settings from backend to get updated state
+                    await this.loadSettings();
+                    console.log('Target removed successfully');
+                    // Show success message without toast dependency
+                    this.showTempMessage('Target removed successfully', 'success');
+                } else {
+                    console.error('Target not found');
+                    this.showTempMessage('Target not found', 'error');
+                }
+            } else {
+                // Fallback for development mode - update local state only
+                console.log('Before remove, targets:', this.settings.targets.length);
+                this.settings.targets = this.settings.targets.filter(t => t.id !== targetId);
+                console.log('After remove, targets:', this.settings.targets.length);
+                
+                // If removed primary, make first target primary
+                if (this.settings.targets.length > 0 && !this.settings.targets.some(t => t.is_primary)) {
+                    this.settings.targets[0].is_primary = true;
+                }
+                
+                this.hasChanges = true;
+                this.renderTargets();
+                this.showTempMessage('Target removed successfully', 'success');
+            }
+        } catch (error) {
+            console.error('Failed to remove target:', error);
+            this.showTempMessage(`Failed to remove target: ${error}`, 'error');
         }
-        
-        this.hasChanges = true;
-        this.renderTargets();
     }
     
     // Record hotkey
@@ -487,15 +500,100 @@ class SettingsManager {
         document.getElementById('target-modal').classList.remove('active');
     }
     
+    // Custom confirmation dialog
+    showConfirmDialog(title, message) {
+        return new Promise((resolve) => {
+            // Create confirmation dialog
+            const dialog = document.createElement('div');
+            dialog.className = 'modal confirm-modal active';
+            dialog.innerHTML = `
+                <div class="modal-content">
+                    <h3>${title}</h3>
+                    <p>${message}</p>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary confirm-yes">Yes, Remove</button>
+                        <button class="btn btn-secondary confirm-no">Cancel</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(dialog);
+            
+            // Handle button clicks
+            const yesBtn = dialog.querySelector('.confirm-yes');
+            const noBtn = dialog.querySelector('.confirm-no');
+            
+            const cleanup = () => {
+                document.body.removeChild(dialog);
+            };
+            
+            yesBtn.addEventListener('click', () => {
+                cleanup();
+                resolve(true);
+            });
+            
+            noBtn.addEventListener('click', () => {
+                cleanup();
+                resolve(false);
+            });
+            
+            // Close on background click
+            dialog.addEventListener('click', (e) => {
+                if (e.target === dialog) {
+                    cleanup();
+                    resolve(false);
+                }
+            });
+            
+            // Close on Escape key
+            const escapeHandler = (e) => {
+                if (e.key === 'Escape') {
+                    document.removeEventListener('keydown', escapeHandler);
+                    cleanup();
+                    resolve(false);
+                }
+            };
+            document.addEventListener('keydown', escapeHandler);
+        });
+    }
+    
+    // Show temporary message
+    showTempMessage(message, type = 'info') {
+        const messageEl = document.createElement('div');
+        messageEl.className = `temp-message temp-message-${type}`;
+        messageEl.textContent = message;
+        messageEl.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+        `;
+        
+        document.body.appendChild(messageEl);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            messageEl.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => {
+                if (messageEl.parentNode) {
+                    document.body.removeChild(messageEl);
+                }
+            }, 300);
+        }, 3000);
+    }
+    
     showSuccess(message) {
-        // TODO: Implement toast notifications
-        console.log('Success:', message);
+        this.showTempMessage(message, 'success');
     }
     
     showError(message) {
-        // TODO: Implement toast notifications
-        console.error('Error:', message);
-        alert(message);
+        this.showTempMessage(message, 'error');
     }
     
     async closeWindow() {
@@ -546,7 +644,7 @@ class SettingsManager {
                 always_on_top: true,
                 play_join_sound: true,
                 show_notifications: true,
-                theme: 'system'
+
             },
             keybinds: {
                 join_primary: 'Cmd+Shift+J',

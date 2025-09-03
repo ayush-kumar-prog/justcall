@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JustCall Settings</title>
+    <title>Blink Settings</title>
     <link rel="stylesheet" href="styles.css">
     <script>
         // Wait for Tauri API to be injected
@@ -36,8 +36,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>JustCall Settings</h1>
-            <button id="close-btn" class="close-btn" aria-label="Close">×</button>
+            <h1>Blink Settings</h1>
         </header>
 
         <div class="tabs">
@@ -90,7 +89,7 @@
                 <div class="preference-group">
                     <label>
                         <input type="checkbox" id="autostart">
-                        <span>Start JustCall when computer starts</span>
+                        <span>Start Blink when computer starts</span>
                     </label>
                 </div>
                 
@@ -115,23 +114,16 @@
                     </label>
                 </div>
                 
-                <div class="preference-group">
-                    <label for="theme">Theme:</label>
-                    <select id="theme">
-                        <option value="system">System</option>
-                        <option value="light">Light</option>
-                        <option value="dark">Dark</option>
-                    </select>
-                </div>
+
             </div>
 
             <!-- About Tab -->
             <div id="about-tab" class="tab-content">
-                <h2>About JustCall</h2>
+                <h2>About Blink</h2>
                 
                 <div class="about-content">
                     <div class="logo">📞</div>
-                    <h3>JustCall</h3>
+                    <h3>Blink</h3>
                     <p>Version 0.1.0</p>
                     <p>Instant video calls with a single hotkey press.</p>
                     
@@ -154,7 +146,6 @@
 
         <footer>
             <button id="save-btn" class="btn btn-primary">Save Changes</button>
-            <button id="cancel-btn" class="btn btn-secondary">Cancel</button>
         </footer>
     </div>
 

@@ -137,7 +137,7 @@ impl GlobalShortcutService {
     /// Why: Called on app startup to enable hotkeys
     /// Used by: App setup after loading settings
     /// Calls: register_hotkey
-    pub fn setup_default_hotkeys(&mut self, keybinds: &justcall::models::settings::Keybinds) -> Result<(), String> {
+    pub fn setup_default_hotkeys(&mut self, keybinds: &blink::models::settings::Keybinds) -> Result<(), String> {
         log::info!("Setting up default hotkeys");
         
         // Register join primary

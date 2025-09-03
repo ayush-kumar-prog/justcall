@@ -1,4 +1,4 @@
-# JustCall
+# Blink
 
 Zero-friction video calling. Press a hotkey → instantly in a call.
 

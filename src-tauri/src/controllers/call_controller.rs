@@ -5,7 +5,7 @@
 /// Note: This is a simplified version after the full controller was deleted
 
 use crate::services::conference_window::{ConferenceWindow, ConferenceConfig};
-use justcall::core::CallState;
+use blink::core::CallState;
 use std::sync::Mutex;
 use tauri::AppHandle;
 

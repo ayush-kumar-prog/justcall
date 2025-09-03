@@ -29,7 +29,7 @@ pub async fn save_settings(
     };
     
     // Deserialize the new settings
-    let new_settings: justcall::models::Settings = serde_json::from_value(settings)
+    let new_settings: blink::models::Settings = serde_json::from_value(settings)
         .map_err(|e| format!("Invalid settings format: {}", e))?;
     
     // Update hotkeys if changed
@@ -61,7 +61,7 @@ pub async fn save_settings(
 
 #[tauri::command]
 pub async fn generate_code() -> Result<String, String> {
-    Ok(justcall::core::crypto::generate_code_base32_100b())
+    Ok(blink::core::crypto::generate_code_base32_100b())
 }
 
 #[tauri::command]
@@ -83,4 +83,12 @@ pub async fn test_hotkey(hotkey: String, state: State<'_, AppState>) -> Result<(
     shortcuts.unregister_hotkey(&hotkey)?;
     
     Ok(())
+}
+
+#[tauri::command]
+pub async fn remove_target(id: String, state: State<'_, AppState>) -> Result<bool, String> {
+    let mut store = state.settings_store.lock().unwrap();
+    
+    store.remove_target(&id)
+        .map_err(|e| format!("Failed to remove target: {}", e))
 }

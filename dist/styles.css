@@ -436,3 +436,51 @@ footer {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--border);
 }
+
+/* Animations for temp messages */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Confirmation modal styles */
+.confirm-modal .modal-content {
+    max-width: 400px;
+    text-align: center;
+}
+
+.confirm-modal .modal-content p {
+    margin: var(--spacing-md) 0;
+    color: var(--text-secondary);
+}
+
+.confirm-modal .modal-footer {
+    gap: var(--spacing-sm);
+}
+
+.confirm-modal .confirm-yes {
+    background: var(--danger);
+    border-color: var(--danger);
+}
+
+.confirm-modal .confirm-yes:hover {
+    background: #d73333;
+    border-color: #d73333;
+}

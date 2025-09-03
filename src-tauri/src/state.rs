@@ -3,7 +3,7 @@
 // Why: Provides thread-safe access to settings and other stateful components
 // Used by: commands.rs, lib.rs
 
-use justcall::storage::SettingsStore;
+use blink::storage::SettingsStore;
 use crate::services::global_shortcuts::GlobalShortcutService;
 use crate::services::conference_window::ConferenceWindow;
 use crate::controllers::call_controller::CallController;

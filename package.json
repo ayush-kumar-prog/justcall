@@ -1,5 +1,5 @@
 {
-  "name": "justcall",
+  "name": "blink",
   "version": "1.0.0",
   "description": "Zero-friction video calling. Press a hotkey → instantly in a call.",
   "main": "index.js",

@@ -60,9 +60,7 @@ pub struct AppSettings {
     #[serde(default = "default_true")]
     pub show_notifications: bool,
     
-    /// Theme preference (for future use)
-    #[serde(default)]
-    pub theme: Theme,
+
 }
 
 impl Default for AppSettings {
@@ -72,25 +70,12 @@ impl Default for AppSettings {
             always_on_top: true,
             play_join_sound: true,
             show_notifications: true,
-            theme: Theme::System,
+
         }
     }
 }
 
-/// Theme options
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all = "lowercase")]
-pub enum Theme {
-    Light,
-    Dark,
-    System,
-}
 
-impl Default for Theme {
-    fn default() -> Self {
-        Theme::System
-    }
-}
 
 /// Keyboard shortcut configuration
 /// What: All hotkey bindings for the app

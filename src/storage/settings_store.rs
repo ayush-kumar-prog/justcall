@@ -35,7 +35,7 @@ impl SettingsStore {
         let config_dir = dirs::config_dir()
             .context("Failed to determine config directory")?;
         
-        let app_dir = config_dir.join("justcall");
+        let app_dir = config_dir.join("blink");
         let file_path = app_dir.join("settings.json");
         
         Self::load_from_path(file_path)

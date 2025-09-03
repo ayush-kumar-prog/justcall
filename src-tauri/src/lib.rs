@@ -23,15 +23,15 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             // Initialize settings store
-            let settings_store = match justcall::storage::SettingsStore::load() {
+            let settings_store = match blink::storage::SettingsStore::load() {
                 Ok(store) => store,
                 Err(e) => {
                     log::error!("Failed to load settings: {}", e);
                     log::info!("Using default settings");
-                    justcall::storage::SettingsStore::new_with_path(
+                    blink::storage::SettingsStore::new_with_path(
                         dirs::config_dir()
                             .unwrap_or_else(|| std::path::PathBuf::from("."))
-                            .join("justcall")
+                            .join("blink")
                             .join("settings.json")
                     )
                 }
@@ -72,7 +72,7 @@ pub fn run() {
             // Create tray icon with menu
             let _tray = TrayIconBuilder::new()
                 .icon(app.default_window_icon().unwrap().clone())
-                .tooltip("JustCall - Right-click for menu")
+                .tooltip("Blink - Right-click for menu")
                 .menu(&menu)
                 .show_menu_on_left_click(false) // Right-click only for menu
                 .on_menu_event(|app, event| match event.id.as_ref() {
@@ -96,7 +96,7 @@ pub fn run() {
                                     "settings",
                                     WebviewUrl::App("settings.html".into())
                                 )
-                                .title("JustCall Settings")
+                                .title("Blink Settings")
                                 .inner_size(700.0, 600.0)
                                 .resizable(true)
                                 .build()
@@ -154,7 +154,7 @@ pub fn run() {
                             let settings_store = state.settings_store.lock().unwrap();
                             if let Some(target) = settings_store.get_primary_target() {
                                 log::info!("Primary target found: {} with code: {}", target.label, target.code);
-                                let room_id = justcall::core::room_id_from_code(&target.code);
+                                let room_id = blink::core::room_id_from_code(&target.code);
                                 log::info!("Generated room ID from code '{}': '{}'", target.code, room_id);
                                 let config = ConferenceConfig {
                                     room_id: room_id.clone(),
@@ -182,7 +182,7 @@ pub fn run() {
                             // Get target from settings
                             let settings_store = state.settings_store.lock().unwrap();
                             if let Some(target) = settings_store.get_target(&id) {
-                                let room_id = justcall::core::room_id_from_code(&target.code);
+                                let room_id = blink::core::room_id_from_code(&target.code);
                                 drop(settings_store);
                                 
                                 // Open directly in browser instead of using conference window
@@ -220,7 +220,7 @@ pub fn run() {
                 controller.on_conference_left();
             });
             
-            log::info!("JustCall initialized successfully");
+            log::info!("Blink initialized successfully");
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -229,6 +229,7 @@ pub fn run() {
             commands::generate_code,
             commands::validate_hotkey,
             commands::test_hotkey,
+            commands::remove_target,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
