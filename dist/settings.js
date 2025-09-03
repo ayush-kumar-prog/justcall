@@ -10,6 +10,10 @@ class SettingsManager {
         this.settings = null;
         this.editingTargetId = null;
         
+        // Check if this is welcome/onboarding mode
+        const urlParams = new URLSearchParams(window.location.search);
+        this.isWelcomeMode = urlParams.get('welcome') === 'true';
+        
         this.init();
     }
     
@@ -158,6 +162,11 @@ class SettingsManager {
         this.renderTargets();
         this.renderHotkeys();
         this.renderPreferences();
+        
+        // Show welcome guidance if in welcome mode
+        if (this.isWelcomeMode) {
+            this.showWelcomeGuidance();
+        }
     }
     
     // Render targets list
@@ -165,10 +174,16 @@ class SettingsManager {
         const container = document.getElementById('targets-list');
         
         if (this.settings.targets.length === 0) {
+            const welcomeClass = this.isWelcomeMode ? ' welcome-mode' : '';
             container.innerHTML = `
-                <div class="empty-state">
-                    <p>No targets configured yet.</p>
-                    <p>Click "Add Target" to set up your first call partner or group.</p>
+                <div class="empty-state${welcomeClass}">
+                    <div class="empty-icon">👥</div>
+                    <h3>No targets yet</h3>
+                    <p>Targets are people or groups you can instantly call with a hotkey.</p>
+                    <div class="empty-actions">
+                        <p><strong>Get started:</strong> Click "Add Target" above to create your first connection.</p>
+                        ${this.isWelcomeMode ? '<div class="welcome-arrow">👆 Start here!</div>' : ''}
+                    </div>
                 </div>
             `;
             return;
@@ -594,6 +609,44 @@ class SettingsManager {
     
     showError(message) {
         this.showTempMessage(message, 'error');
+    }
+    
+    // Show welcome guidance for first-time users
+    showWelcomeGuidance() {
+        // Show welcome banner
+        const welcomeBanner = document.createElement('div');
+        welcomeBanner.className = 'welcome-banner';
+        welcomeBanner.innerHTML = `
+            <div class="welcome-content">
+                <h3>🎉 Welcome to Blink!</h3>
+                <p>Let's set up your first video call target in 3 easy steps:</p>
+                <ol>
+                    <li><strong>Click "Add Target"</strong> to create your first connection</li>
+                    <li><strong>Share the code</strong> with someone you want to call</li>
+                    <li><strong>Set up hotkeys</strong> for instant calling</li>
+                </ol>
+                <button class="btn btn-small btn-secondary" onclick="this.parentElement.parentElement.remove()">Got it!</button>
+            </div>
+        `;
+        
+        // Insert banner at the top of targets tab
+        const targetsTab = document.getElementById('targets-tab');
+        targetsTab.insertBefore(welcomeBanner, targetsTab.firstChild);
+        
+        // Highlight the Add Target button
+        const addTargetBtn = document.getElementById('add-target-btn');
+        if (addTargetBtn) {
+            addTargetBtn.classList.add('highlight-pulse');
+            
+            // Remove highlight after 10 seconds or when clicked
+            const removeHighlight = () => {
+                addTargetBtn.classList.remove('highlight-pulse');
+                addTargetBtn.removeEventListener('click', removeHighlight);
+            };
+            
+            setTimeout(removeHighlight, 10000);
+            addTargetBtn.addEventListener('click', removeHighlight);
+        }
     }
     
     async closeWindow() {

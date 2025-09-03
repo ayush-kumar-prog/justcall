@@ -137,6 +137,30 @@ pub fn run() {
                 window.hide()?;
             }
             
+            // Check if this is first run and show onboarding if needed
+            let app_state = app.state::<AppState>();
+            let is_first_run = {
+                let settings_store = app_state.settings_store.lock().unwrap();
+                settings_store.get_targets().is_empty()
+            };
+            
+            if is_first_run {
+                log::info!("First run detected - showing welcome");
+                
+                // Auto-open settings window for first-time users
+                let _welcome_window = WebviewWindowBuilder::new(
+                    app,
+                    "welcome",
+                    WebviewUrl::App("settings.html?welcome=true".into())
+                )
+                .title("Welcome to Blink - Let's Get Started!")
+                .inner_size(750.0, 650.0)
+                .center()
+                .resizable(true)
+                .build()
+                .expect("failed to build welcome window");
+            }
+            
             // Listen for hotkey events
             let app_handle = app.handle().clone();
             app.listen("hotkey-pressed", move |event| {
